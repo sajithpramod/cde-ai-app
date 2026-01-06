@@ -207,12 +207,7 @@ docker-compose up
 
 ## 📝 Additional Documentation
 
-- [Deployment Guide](DEPLOYMENT_READY.md)
-- [TypeScript Migration Guide](TYPESCRIPT_MIGRATION_GUIDE.md)
-- [Ensemble Feature Documentation](README_ENSEMBLE_FEATURE.md)
-- [Scheduler Guide](SCHEDULER_GUIDE.md)
 - [Log Viewing Guide](LOG_VIEWING_GUIDE.md)
-- [Quick Start Guide](QUICK_START.md)
 
 ## 🔧 Troubleshooting
 

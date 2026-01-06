@@ -252,7 +252,7 @@ MIT
 
 ## 👥 Authors
 
-Cerulean Information technoligy
+cerulean information technology pvt ltd
 
 ---
 

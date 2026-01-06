@@ -1,0 +1,34 @@
+<body>
+
+<section id="reg_login">
+  <div class="container">
+    <div class="user signinBx">
+      <div class="imgBx"><img src="images/login-img_cdeenv.jpg" alt="" /></div>
+      <div class="formBx">
+        <form action="/auth/login" method="POST">
+          <div class="sublogimages"><img src="images/logo.png" alt="" /></div>
+          
+          <% if (locals.error) { %>
+            <div class="alert alert-danger" style="color: red; margin-bottom: 10px; text-align: center;">
+              <%= error %>
+            </div>
+          <% } %>
+
+          <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+          <div class="input-group" style="margin-bottom: 15px;">
+            <input type="email" name="email" placeholder="Enter   Email" required class="form-control" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+          </div>
+          <button type="submit" class="signbtn">Sign In</button>      
+        </form>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+
+        <script nonce="<%= nonce %>" src="js/jquery.min.js"></script>
+        <script nonce="<%= nonce %>" src="boostrap/bootstrap.min.js"></script>
+
+</body>
+

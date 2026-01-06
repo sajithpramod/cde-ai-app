@@ -1,0 +1,443 @@
+<body>
+    <article>
+    <header>
+      <div class="headerlogo"><img src="images/logo.png" alt="" /><span class="navtittile">Occasion-Motivation Forecasting</span></div>
+      <div class="header-actions">
+        <button type="button" id="startFreshBtn" class="btn btn-warning" style="display: none;">
+          <i class="fa fa-refresh"></i> Start Fresh
+        </button>
+        <a href="/dashboard" class="btn btn-outline-primary" style="margin-left: 10px;">
+          <i class="fa fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <a href="/auth/logout" class="btn btn-danger" style="margin-left: 10px;">
+          <i class="fa fa-sign-out"></i> Logout
+        </a>
+      </div>
+    </header>
+    
+
+
+    <form id="uploadForm" enctype="multipart/form-data">
+     
+  <div class="uploadcontainer">
+    <h2>Occasion-Motivation forecasting</h2>
+    
+
+     <!-- Market Selection -->
+   <!-- Type of Model -->
+<div class="section">
+  <label for="typeOfModel">"Forecasting scope</label>
+  <select id="typeOfModel">
+    <option value="">-- Select Market --</option>
+    <option value="in">In-Market</option>
+    <option value="above">Above-Market (global/regional)</option>
+    
+  </select>
+  <input type="hidden" name="modelType" id="typeOFModeld">
+</div>
+
+<!-- Market Model (shown only for 'above') -->
+<div id="marketModelSection" class="section d-none">
+  <label for="marketModel">Market Segmentation Type</label>
+  <select id="marketModel">
+    <option value="">-- Select Market --</option>
+    <option value="FPA">FP&A F25</option>
+    <option value="MGF">MGF</option>
+  </select>
+  <input type="hidden" name="marketModel" id="hiddenMarketModelId">
+</div>
+
+<!-- Market Dropdown -->
+<!-- <div id="marketSelectSection" class="section">
+  <label for="marketSelect">Select a Market</label>
+  <select id="marketSelect">
+    <option value="">-- Select Market --</option>
+  </select>
+  <input type="hidden" name="marketId" id="hiddenMarketId">
+</div> -->
+
+<!-- <div id="marketSelectSection" class="section">
+  <label for="marketSearch">Search & Select Market</label>
+  <div class="select-wrapper">
+    <input type="text" id="marketSearch" placeholder="Search..." class="form-control input-stacked" />
+    <select id="marketSelect" size="5" class="form-control select-stacked"></select>
+  </div>
+
+  <input type="hidden" name="marketId" id="hiddenMarketId">
+</div> -->
+
+<div id="marketSelectSection" class="section">
+  <label for="marketSelect">Market</label>
+  <select id="marketSelect" name="marketId" placeholder="Start typing..."></select>
+  <input type="hidden" id="hiddenMarketId" name="marketId">
+  <div id="marketWarning" class="text-danger d-none mt-10"></div>
+</div>
+
+    <!-- Sub-cluster -->
+<div id="subClusterSection" class="section hidden">
+  <label for="subClusterSelect">Select Sub-cluster(s)</label>
+  <select id="subClusterSelect">
+    <option value="AllCountries">All countries</option>
+    <option value="MultipleCountries">Multiple countries/Single country</option>
+    <option value="Subclusters">Sub Cluster</option>
+  </select>
+</div>
+
+<div id="countryMultiSelectSection" class="section d-none mt-10">
+  <label for="countryMultiSelect">Select Countries</label>
+  <select id="countryMultiSelect" multiple></select>
+  <input type="hidden" id="hiddenCountryId" name="marketId">
+</div>
+
+
+<!-- <div id="subclusterteaxtarea" class="form-group d-none">
+  <label for="comment">Market Name</label>
+  <input class="form-control" rows="5" id="comment" placeholder="Please enter a  name">
+  <div class="invalid-feedback">Market Name is required.</div>
+</div> -->
+<div id="subclusterteaxtarea" class="form-group d-none">
+  <label for="comment">Forecast output file name</label><span class="clor-red">*</span>
+  <input type="text" class="form-control" id="comment" placeholder="Give your output file a name">
+  <div class="invalid-feedback">Forecast output file name is required.</div>
+</div>
+
+    <!-- Data Type -->
+    <div id="dataTypeSection" class="section hidden">
+      <label for="dataType">Select Data Type</label>
+      <select id="dataType">
+        <option value="">-- Select --</option>
+        <option value="iwsr">IWSR</option>
+        <option value="Nielsen">Retail</option>
+      </select>
+    </div>
+
+    <!-- One File Upload -->
+
+    
+
+
+    
+
+    <!-- Upload 5 More Files -->
+    <div id="multiFileUploadSection" class="section hidden">
+      <div id="group0" class="file-group d-none">
+        <label for="initialDataFile" class="form-label">
+          Upload the CCF x Sales Data mapping file
+      
+          <span class="info-icon-wrapper">
+            <i class="fa fa-info-circle cursor"></i>
+            <div class="tooltip-popup">
+              <strong>Expected Format:</strong><br><br>
+              CSV file with the following columns:
+              <ul class="ul-pd">
+                <li><code>CustomerID</code></li>
+                <li><code>SalesAmount</code></li>
+                <li><code>ProductCategory</code></li>
+                <li><code>Region</code></li>
+              </ul>
+              <br>
+              Example row:<br>
+              <code>12345, 56000, Spirits, Europe</code>
+            </div>
+          </span>
+        </label>
+      
+        <input title="Retail Sales Data Source" type="file" class="form-control file-input" name="initialDataFile" id="initialDataFile">
+
+        <div class="form-text text-primary loader d-none"><span class="reportloader"></span>⏳Processing...</div>
+        <div class="form-text text-danger error-message d-none"></div>
+        <div class="form-text text-success success-message d-none"></div>
+
+        <!-- Download buttons for mapped CSV files (shown after successful upload) -->
+        
+      </div>
+      
+    <!-- IWSR Tier Column Selection -->
+    <div id="iwsrColumnSelection" class="section hidden">
+      <label id="priceTierLbl">Select Price Tier Column</label>
+      <div class="radio-group" id="radio-priceTier">
+      </div>
+    </div>
+
+    <div id="currencyExchnageSelection" class="section d-none">
+      <div class="download-button-wrapper mb-3">
+        <a href="/upload/exchange-rate" class="btn btn-primary" download>
+          ⬇️ Download Exchange Rate File
+        </a>
+      </div>
+
+      <table class="table" id="currency-convert-table">
+        <thead>
+          <tr>
+            <th>Currency<span class="clor-red">*</span> 
+              <span
+                class="info-icon-currency"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Currency from TBA Current Value Pools RSV and   Current Value Pools RSV file">
+              <i class="fa fa-info-circle cursor"></i>
+              <div class="tooltip-popup">
+                Currency from TBA Current Value Pools RSV and   Current Value Pools RSV file
+              </div>
+            </span>
+            </th>
+            <th>Desired output currency<span class="clor-red">*</span></th>
+            <th>Exchange Rate<span class="clor-red">*</span></th>
+           
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <select id="fromCurrency" class="currency-dropdown form-select">
+                <!-- options will be injected -->
+              </select>
+              <small class="text-danger d-none" id="fromCurrencyError">Please select a currency</small>
+            </td>
+            <td>
+              <select id="toCurrency" class="currency-dropdown form-select">
+                <!-- options will be injected -->
+              </select>
+              <small class="text-danger d-none" id="toCurrencyError">Please select an output currency</small>
+             
+            </td>
+            <td>
+              <input type="number" step="0.0001" class="form-control" id="exchangeRate" placeholder="e.g. 1.2345" />
+              <small class="text-danger d-none" id="exchangeRateError">Please enter a valid exchange rate</small>
+            </td>
+          </tr>
+          <tr><td colspan="3"><div class="text-end mt-3">
+            <button class="btn btn-success" id="continueBtn">✅ Continue</button>
+          </div></td></tr>
+        </tbody>
+      </table>
+      <!-- Button Below the Table -->
+      
+    </div>
+    
+
+      <div id="group1" class="file-group d-none">
+        <label for="TBSNSVFile" class="form-label">Upload TBA Current Value Pools RSV</label>
+        <input class="form-control file-input" type="file" name="TBSNSVFile" id="TBSNSVFile">
+        <div class="form-text text-primary loader d-none"><span class="reportloader"></span>⏳Processing...</div>
+        <div class="form-text text-danger error-message d-none"></div>
+        <div class="form-text text-success success-message d-none"></div>
+      </div>
+
+      <div id="group2" class="file-group d-none">
+        <label for=" ategoryRSVFile" class="form-label">Upload   Current Value Pools RSV</label>
+        <input class="form-control file-input" type="file" name=" ategoryRSVFile" id=" ategoryRSVFile">
+        <div class="form-text text-primary loader d-none"><span class="reportloader"></span>⏳Processing...</div>
+        <div class="form-text text-danger error-message d-none"></div>
+        <div class="form-text text-success success-message d-none"></div>
+      </div>
+
+     
+  
+  
+   
+    <div id="group3" class="file-group d-none">
+      <label for="CPSdataFile" class="form-label">Upload Kantar CCF serves data</label>
+      <input class="form-control file-input" type="file" name="CPSdataFile" id="CPSdataFile">
+      <div class="form-text text-primary loader d-none"><span class="reportloader"></span>⏳Processing...</div>
+      <div class="form-text text-danger error-message d-none"></div>
+      <div class="form-text text-success success-message d-none"></div>
+    </div>  
+   
+    <div id="tabRsvFilePriceColumn" class="section hidden">
+      <label>Tba Rsv Price Tier Column</label>
+      <div class="radio-group1" id="radio-priceTier1">
+      </div>
+    </div>
+
+    
+
+    <div id="group4" class="file-group d-none">
+      <label for="CCFbackdataFile" class="form-label">Upload CCF historical data (data prior to F23)</label>
+      <input class="form-control file-input" type="file" name="CCFbackdataFile" id="CCFbackdataFile">
+      <div class="form-text text-primary loader d-none"><span class="reportloader"></span>⏳Processing...</div>
+      <div class="form-text text-danger error-message d-none"></div>
+      <div class="form-text text-success success-message d-none"></div>
+      <div id="initialDataFileDownloads" class="download-buttons-wrapper mt-3 d-none">
+        <div class="d-flex gap-2 flex-wrap">
+          <button type="button" class="btn btn-sm btn-outline-success download-csv-btn" data-file="mapped_latest_year_data.csv">
+            <i class="fa fa-download me-1"></i> Download Latest Year Data
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-success download-csv-btn" data-file="mapped_back_data.csv">
+            <i class="fa fa-download me-1"></i> Download Back Data
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rename and Rank Tiers -->
+    <div id="priceTierRenameRank" class="section hidden">
+      <div class="info-text">Name your price tiers to align with your market's naming convention if needed. Then, rank how you would like the price tiers to appear e.g. If you'd like your highest price tier to appear first, select "1" in the ranking.</div>
+      <table class="table tier-table">
+        <thead>
+          <tr>
+            <th>Original Tier</th>
+            <th>Rename</th>
+            <th>
+              Rank <span class="clor-red">*</span><br/>
+              <span class="f1-size">Rank is mandatory.</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Price_Tier_1</td>
+            <td><input type="text" class="form-control" placeholder="New Name for Tier 1"></td>
+            <td>
+              <div class="position-relative">
+                <input type="number" min="1" step="1"  inputmode="numeric"
+                pattern="[0-9]*" placeholder="Rank" class="form-control rank-input" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onkeypress="return isNumberKey(event)">
+                <div class="invalid-feedback">Rank is required.</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Price_Tier_2</td>
+            <td><input type="text" class="form-control" placeholder="New Name for Tier 2"></td>
+            <td>
+              <div class="position-relative">
+                <input type="number" min="1" placeholder="Rank" class="form-control rank-input">
+                <div class="invalid-feedback">Rank is required.</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Price_Tier_3</td>
+            <td><input type="text" class="form-control" placeholder="New Name for Tier 3"></td>
+            <td>
+              <div class="position-relative">
+                <input type="number" min="1" placeholder="Rank" class="form-control rank-input">
+                <div class="invalid-feedback">Rank is required.</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="durationSection" class="section hidden">
+      <label for="forecastDuration">Forecast Horizon</label>
+      <select id="forecastDuration">
+        <option value="">--Select the number of
+          years ahead you are
+          forecasting for--</option>
+        <option value="3">Current + 3 Years</option>
+        <option value="4">Current + 4 Years</option>
+        <option value="5">Current + 5 Years</option>
+      </select>
+      <div id="forecastWarning" class="form-text text-danger mt-2 d-none">
+        ⚠️ 5 year forecast horizon is not recommended for lack of robustness; only use forecast results directionally.
+      </div>
+      <div class="invalid-feedback">Foracst Horizon is required.</div>
+      <div class="form-text text-primary loader d-none"><span class="reportloader"></span>⏳Processing...</div>
+      <div class="form-text text-danger error-message d-none"></div>
+      
+    </div>
+    
+   <div id="group5" class="file-group d-none">
+    <label for="foresightFile" class="form-label">Please upload Foresights data</label>
+    <input class="form-control file-input" type="file" name="ForesightFile" id="ForesightFile" accept=".xlsx">
+    <div class="form-text text-primary loader d-none"><span class="reportloader"></span>⏳Processing...</div>
+    <div class="form-text text-danger error-message d-none"></div>
+    <div class="form-text text-success success-message d-none"></div>
+  </div>
+
+ 
+
+  <!-- </div> -->
+
+    <!-- Forecast Duration -->
+  
+
+    <!-- CAGR Input Section -->
+    <div id="cagrSection" class="section hidden">
+      <label>Enter the Price Tier Forecast for each price tier</label>
+      <div id="countryDropdownContainer"></div>
+     
+      <div id="growthTypeSelector" class="mb-2">
+        <label><strong>Select Growth Input Type:</strong></label><br>
+        <label><input type="radio" name="growthType" value="CAGR" checked> CAGR (%)</label>
+        <label style="margin-left: 20px;"><input type="radio" name="growthType" value="Base100"> Base 100</label>
+      </div>
+      <div id="cagerInfo" class="info-text">
+        Enter the % change expected for each price tier for your forecast horizon. E.g. If you are forecasting for the next 4 years and you are expecting Standard to grow by 5% over this time, enter "5" in the box for Standard.
+      </div>
+      
+      <table class="tier-table">
+        <tr>
+          <th>Tier Name</th>
+          <th>CAGR (%)</th>
+        </tr>
+        <tr>
+          <td>Price_Tier_1</td>
+          <td><input type="number" step="0.01" placeholder="e.g. 4.5"></td>
+        </tr>
+        <tr>
+          <td>Price_Tier_2</td>
+          <td><input type="number" step="0.01" placeholder="e.g. 2.3"></td>
+        </tr>
+        <tr>
+          <td>Price_Tier_3</td>
+          <td><input type="number" step="0.01" placeholder="e.g. 5.0"></td>
+        </tr>
+      </table>
+    </div>
+    <div id="file-upload-progress"  class="text-info mb-2"></div>
+   
+    <button type="submit" id="submit" class="d-none">Create your forecast</button>
+    <div id="status"></div>
+</div>
+
+
+  </div>
+</form>
+</article>
+<script nonce="<%= nonce %>" src="/socket.io/socket.io.js"></script>
+<!-- <script src="js/utils.js"></script>
+<script src="js/validation.js"></script>
+<script src="js/renderers.js"></script>
+<script src="js/uploadHandlers.js"></script> -->
+<script nonce="<%= nonce %>" type="module" src="js/choices.min.js"></script>
+<script nonce="<%= nonce %>" src="dist/bundle.js"></script>
+<script nonce="<%= nonce %>"  type="module"  src="js/aboveMarket.js"></script>
+
+</div>
+<div id="reportspinner" class="reportspinner hidden">
+  <div class="reportloader"></div>
+</div>
+<div id="progressPopup">
+  <div id="progressStatus">Progress: 0 / 11 steps completed</div>
+  <progress id="progressBar" max="11" value="0"></progress>
+</div>
+<!-- Popup for Above-Market -->
+
+
+
+<div id="aboveMarketPopup" class="popup hidden">
+  <div class="popup-content">
+    <!-- Close button -->
+    <button id="closePopup" class="close-btn" aria-label="Close"><span>&times;</span></button>
+
+    <h3>Above Market Forecast</h3>
+    <div id="spinnerContainer" class="spinner hidden"></div>
+    <!-- <p id="processStatus">Ready to start...</p> -->
+
+    <div class="popup-actions">
+      <button id="viewReportBtn" class="btn">View Report</button>
+      <button id="createForecastBtn" class="btn btn-primary">Create Forecast</button>
+    </div>
+    <p id="processStatus1">Ready to start...</p>
+    <div id="progressContainer" class="progress-container hidden">
+        <div id="aboveMarketprogressBar" class="progress-bar"></div>
+     </div>
+  </div>
+  
+</div>
+</body>
+
+

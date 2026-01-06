@@ -1,0 +1,1 @@
+{"version":3,"file":"pathTraversalProtection.d.ts","sourceRoot":"","sources":["../../middlewares/pathTraversalProtection.ts"],"names":[],"mappings":"AAIA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,YAAY,EAAE,MAAM,SAAS,CAAC;AAW1D,QAAA,MAAM,uBAAuB,GAAI,KAAK,OAAO,EAAE,KAAK,QAAQ,EAAE,MAAM,YAAY,KAAG,IAuDlF,CAAC;AAEF,eAAe,uBAAuB,CAAC"}

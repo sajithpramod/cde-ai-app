@@ -1,0 +1,23 @@
+{"level":"info","message":"✓ Server running at http://localhost:3000","module":"server","timestamp":"2025-12-23 10:22:10"}
+{"level":"info","message":"✓ Environment: development","module":"server","timestamp":"2025-12-23 10:22:10"}
+{"level":"info","message":"✓ Session timeout: 90 minutes","module":"server","timestamp":"2025-12-23 10:22:10"}
+{"level":"info","message":"✓ CSRF protection: Enabled","module":"server","timestamp":"2025-12-23 10:22:10"}
+{"level":"info","message":"✓ Rate limiting: Enabled","module":"server","timestamp":"2025-12-23 10:22:10"}
+{"level":"info","message":"✓ Security logging: Enabled","module":"server","timestamp":"2025-12-23 10:22:10"}
+{"level":"info","message":"✓ Server running at http://localhost:3000","module":"server","timestamp":"2025-12-23 10:50:48"}
+{"level":"info","message":"✓ Environment: development","module":"server","timestamp":"2025-12-23 10:50:48"}
+{"level":"info","message":"✓ Session timeout: 90 minutes","module":"server","timestamp":"2025-12-23 10:50:48"}
+{"level":"info","message":"✓ CSRF protection: Enabled","module":"server","timestamp":"2025-12-23 10:50:48"}
+{"level":"info","message":"✓ Rate limiting: Enabled","module":"server","timestamp":"2025-12-23 10:50:48"}
+{"level":"info","message":"✓ Security logging: Enabled","module":"server","timestamp":"2025-12-23 10:50:48"}
+{"level":"info","message":"✓ Server timeout: 240 minutes","module":"server","timestamp":"2026-01-02 12:58:44"}
+{"level":"info","message":"✓ Server timeout: 240 minutes","module":"server","timestamp":"2026-01-02 12:59:47"}
+{"level":"info","message":"✓ Server running at http://localhost:3000","module":"server","timestamp":"2026-01-02 12:59:47"}
+{"level":"info","message":"✓ Environment: development","module":"server","timestamp":"2026-01-02 12:59:47"}
+{"level":"info","message":"✓ Session timeout: 90 minutes","module":"server","timestamp":"2026-01-02 12:59:47"}
+{"level":"info","message":"✓ CSRF protection: Enabled","module":"server","timestamp":"2026-01-02 12:59:47"}
+{"level":"info","message":"✓ Rate limiting: Enabled","module":"server","timestamp":"2026-01-02 12:59:47"}
+{"level":"info","message":"✓ Security logging: Enabled","module":"server","timestamp":"2026-01-02 12:59:47"}
+{"level":"info","message":"✓ Server timeout: 240 minutes","module":"server","timestamp":"2026-01-05 12:40:15"}
+{"level":"info","message":"✓ Server timeout: 240 minutes","module":"server","timestamp":"2026-01-05 12:40:15"}
+{"level":"info","message":"✓ Server timeout: 240 minutes","module":"server","timestamp":"2026-01-05 12:40:15"}

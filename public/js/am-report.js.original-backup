@@ -1,0 +1,940 @@
+import { showFlashMessage } from './uiHelpers.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const marketTypeSelect = document.getElementById('marketType');
+    const marketNameSelect = document.getElementById('marketName');
+    const regionSelect = document.getElementById('region');
+
+    // Initialize Choices.js for Market Name multi-select
+    const choices = new Choices(marketNameSelect, {
+        removeItemButton: true,
+        placeholderValue: '-- Select Market --',
+        searchPlaceholderValue: 'Search markets...',
+        shouldSort: false,
+    });
+
+    // Initialize page state - hide ensemble question and charts
+    const ensembleQuestion = document.getElementById('ensembleQuestion');
+    if (ensembleQuestion) {
+        ensembleQuestion.style.display = 'none';
+    }
+
+    // Ensure all chart sections are collapsed on page load
+    hideAllGraphs();
+
+    // Download Excel Report Button Handler
+    document.getElementById('downloadReportBtn').addEventListener('click', async () => {
+        const marketType = marketTypeSelect.value;
+        const region = regionSelect.value;
+        const selectedMarkets = choices.getValue(true);
+
+        if (!marketType || !region || selectedMarkets.length === 0) {
+            showFlashMessage('Please select Market Type, Region, and at least one Market before downloading the report.', 'warning', 5000);
+            return;
+        }
+
+        const marketsParam = selectedMarkets.join(',');
+        const downloadUrl = `/markets/download-excel?marketType=${encodeURIComponent(marketType)}&region=${encodeURIComponent(region)}&markets=${encodeURIComponent(marketsParam)}`;
+
+        // Trigger download
+        window.location.href = downloadUrl;
+    });
+
+    marketTypeSelect.addEventListener('change', async () => {
+        const marketType = marketTypeSelect.value;
+
+        // Clear existing choices
+        choices.clearStore();
+        choices.setChoices([{ value: '', label: '-- Loading... --', disabled: true }]);
+
+        if (!marketType) {
+            choices.setChoices([{ value: '', label: '-- Select Market --', disabled: true }]);
+            return;
+        }
+
+        try {
+            const response = await fetch(`/markets/above-markets?marketType=${encodeURIComponent(marketType)}`);
+            const data = await response.json();
+
+            if (data.success) {
+                choices.clearStore();
+                const marketOptions = data.markets.map(m => ({
+                    value: m.market_name,
+                    label: m.market_name
+                }));
+                choices.setChoices(marketOptions, 'value', 'label', true);
+            } else {
+                choices.clearStore();
+                choices.setChoices([{ value: '', label: '-- Error loading markets --', disabled: true }]);
+            }
+        } catch (err) {
+            console.error('Error fetching markets:', err);
+            choices.clearStore();
+            choices.setChoices([{ value: '', label: '-- Error loading markets --', disabled: true }]);
+        }
+    });
+
+    // document.getElementById('applyFilterBtn').addEventListener('click', () => {
+    //     const region = document.getElementById('region').value;
+    //     const marketType = marketTypeSelect.value;
+    //     const selectedMarkets = choices.getValue(true); // returns array of selected values
+
+    //     if (!region || !marketType || selectedMarkets.length === 0) {
+    //         alert('Please select all fields before applying filter.');
+    //         return;
+    //     }
+
+    //     const marketsQuery = selectedMarkets.join(',');
+    //     window.location.href = `/reports?region=${region}&marketType=${marketType}&marketName=${marketsQuery}`;
+    // });
+
+    document.getElementById('applyFilterBtn').addEventListener('click', async () => {
+        const region = document.getElementById('region').value;
+        const marketType = marketTypeSelect.value;
+        const selectedMarkets = choices.getValue(true); // from Choices.js multi-select
+
+        if (!region || !marketType || selectedMarkets.length === 0) {
+            showFlashMessage('Please select all fields before applying filter.', 'warning', 5000);
+            return;
+        }
+
+        try {
+            const marketsParam = selectedMarkets.join(',');
+            const response = await fetch(
+                `/markets/final-category-result?marketType=${encodeURIComponent(marketType)}&region=${encodeURIComponent(region)}&markets=${encodeURIComponent(marketsParam)}`
+            );
+            const result = await response.json();
+
+            if (result.success && result.data.length > 0) {
+                // Store filter state for later use
+                window.currentFilterState = {
+                    marketType,
+                    region,
+                    selectedMarkets,
+                    marketsParam
+                };
+
+                // Render ONLY the data table
+                renderTable(result.data);
+
+                // Hide ALL graph sections
+                hideAllGraphs();
+
+                // Show ensemble question
+                showEnsembleQuestion();
+            } else {
+                document.getElementById('resultsTable').innerHTML = '<p>No data found for the selected filters.</p>';
+            }
+        } catch (err) {
+            console.error('Error fetching results:', err);
+            showFlashMessage('Error fetching data. Please try again.', 'danger', 5000);
+        }
+    });
+
+    function renderTable(data) {
+        const container = document.getElementById('resultsTable');
+        container.innerHTML = ''; // clear old data
+
+        if (data.length === 0) {
+            container.innerHTML = '<div class="alert alert-info"><i class="fa fa-info-circle me-2"></i>No data available.</div>';
+            return;
+        }
+
+        // Destroy existing DataTable if it exists
+        if ($.fn.DataTable.isDataTable('#dataTable')) {
+            $('#dataTable').DataTable().destroy();
+        }
+
+        const table = document.createElement('table');
+        table.id = 'dataTable';
+        table.classList.add('table', 'table-hover', 'table-striped', 'w-100');
+
+        // Create header
+        const headers = Object.keys(data[0]);
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        headers.forEach(h => {
+            const th = document.createElement('th');
+            th.textContent = h;
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // Create body
+        const tbody = document.createElement('tbody');
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            headers.forEach(h => {
+                const td = document.createElement('td');
+                td.textContent = row[h];
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        container.appendChild(table);
+
+        // Initialize DataTable with advanced features
+        $('#dataTable').DataTable({
+            responsive: true,
+            pageLength: 25,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            order: [[0, 'asc']],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search in table...",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of 0 entries",
+                infoFiltered: "(filtered from _MAX_ total entries)",
+                paginate: {
+                    first: "First",
+                    last: "Last",
+                    next: "Next",
+                    previous: "Previous"
+                }
+            },
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                '<"row"<"col-sm-12"tr>>' +
+                '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            columnDefs: [
+                {
+                    targets: '_all',
+                    className: 'dt-body-center'
+                }
+            ],
+            initComplete: function () {
+                console.log('DataTable initialized successfully');
+            }
+        });
+    }
+});
+
+// Global chart instances for cleanup
+let incrementalChart = null;
+let futureValueChartInstance = null;
+let greatestValueChartInstance = null;
+
+async function renderIncrementalChart(marketType) {
+    try {
+        const response = await fetch(`/markets/top-incremental-growth?marketType=${encodeURIComponent(marketType)}`);
+        const result = await response.json();
+
+        if (!result.success) return;
+
+        const labels = result.data.map(d => d.label);
+        const data = result.data.map(d => d.value);
+        const motivations = result.data.map(d => d.motivation);
+
+        // Assign colors based on Motivation
+        const colorMap = {
+            'Connect': '#2ca02c',
+            'Savour': '#EC0089',
+            'Reward': '#035EAD',
+            'Impress': '#8B6AD8',
+            'Revel': '#F3751F',
+            'Relax': '#31B3EE',
+            'Value': '#17becf'
+        };
+
+
+
+        const backgroundColors = motivations.map(m => colorMap[m] || '#999');
+
+        const ctx = document.getElementById('incrementalGrowthChart').getContext('2d');
+
+        // Destroy existing chart if it exists
+        if (incrementalChart) {
+            incrementalChart.destroy();
+        }
+
+        incrementalChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Incremental Growth',
+                    data: data,
+                    backgroundColor: backgroundColors,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: val => val.toLocaleString()
+                        },
+                        title: {
+                            display: true,
+                            text: 'Incremental Growth',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        }
+                    }
+                }
+            }
+        });
+    } catch (err) {
+        console.error('Error loading chart:', err);
+    }
+}
+
+
+// async function renderIncrementalChart(marketType) {
+//     try {
+//         const response = await fetch(`/markets/top-incremental-growth?marketType=${encodeURIComponent(marketType)}`);
+//         const result = await response.json();
+
+//         if (!result.success) return;
+
+//         const labels = result.data.map(d => d.label);
+//         const rawData = result.data.map(d => d.value);
+//         const data = rawData.map(v => Math.abs(v)); // ✅ make bars positive
+//         const motivations = result.data.map(d => d.motivation);
+
+//         // Color mapping
+//         const colorMap = {
+//             'Connect': '#2ca02c',
+//             'Savour': '#e377c2',
+//             'Reward': '#1f77b4',
+//             'Impress': '#9467bd',
+//             'Revel': '#ff7f0e',
+//             'Relax': '#8c564b',
+//             'Value': '#17becf'
+//         };
+
+//         const backgroundColors = motivations.map(m => colorMap[m] || '#999');
+
+//         const ctx = document.getElementById('incrementalGrowthChart').getContext('2d');
+
+//         // Destroy old chart instance if it exists (prevents duplicate rendering)
+//         if (window.incrementalChart) {
+//             window.incrementalChart.destroy();
+//         }
+
+//         window.incrementalChart = new Chart(ctx, {
+//             type: 'bar',
+//             data: {
+//                 labels,
+//                 datasets: [{
+//                     label: 'Incremental Growth',
+//                     data,
+//                     backgroundColor: backgroundColors,
+//                 }]
+//             },
+//             options: {
+//                 indexAxis: 'y',
+//                 responsive: true,
+//                 maintainAspectRatio: false,
+//                 scales: {
+//                     x: {
+//                         beginAtZero: true,
+//                         ticks: {
+//                             callback: val => val.toLocaleString()
+//                         },
+//                         title: {
+//                             display: true,
+//                             text: 'Incremental Growth'
+//                         }
+//                     }
+//                 },
+//                 plugins: {
+//                     legend: { display: false },
+//                     tooltip: {
+//                         callbacks: {
+//                             label: function(context) {
+//                                 // Show original (possibly negative) value in tooltip
+//                                 const original = rawData[context.dataIndex];
+//                                 return `Incremental Growth: ${original.toLocaleString()}`;
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//         });
+//     } catch (err) {
+//         console.error('Error loading chart:', err);
+//     }
+// }
+
+
+async function renderFutureValueChart(marketType, region, selectedMarkets) {
+    try {
+        const marketsParam = selectedMarkets;
+        console.log('region', region);
+        console.log('marketsParam', marketsParam);
+
+        const response = await fetch(
+            `/markets/future-valuepools?marketType=${encodeURIComponent(marketType)}&region=${encodeURIComponent(region)}&markets=${encodeURIComponent(marketsParam)}`
+        );
+        const result = await response.json();
+
+        if (!result.success || result.data.length === 0) {
+            const canvas = document.getElementById('futureValueChart');
+            const parent = canvas.parentElement;
+            parent.innerHTML = '<div class="alert alert-warning"><i class="fa fa-exclamation-triangle me-2"></i>No data available for selected filters.</div>';
+            return;
+        }
+
+        const labels = result.data.map(d => d.label);
+        const data = result.data.map(d => d.value);
+        const motivations = result.data.map(d => d.motivation);
+
+        // Same color mapping logic
+        const colorMap = {
+            'Connect': '#2ca02c',
+            'Savour': '#EC0089',
+            'Reward': '#035EAD',
+            'Impress': '#8B6AD8',
+            'Revel': '#F3751F',
+            'Relax': '#31B3EE',
+            'Value': '#17becf'
+        };
+        const backgroundColors = motivations.map(m => colorMap[m] || '#999');
+
+        const ctx = document.getElementById('futureValueChart').getContext('2d');
+
+        // Destroy existing chart if it exists
+        if (futureValueChartInstance) {
+            futureValueChartInstance.destroy();
+        }
+
+        futureValueChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Future Size',
+                    data: data,
+                    backgroundColor: backgroundColors,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: val => val.toLocaleString()
+                        },
+                        title: {
+                            display: true,
+                            text: 'Future Size',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        }
+                    }
+                }
+            }
+        });
+    } catch (err) {
+        console.error('Error loading future value chart:', err);
+    }
+}
+
+async function rendergreatestIncrementalityValuepoolChart(marketType, region, selectedMarkets) {
+    try {
+        const marketsParam = selectedMarkets;
+        console.log('region', region);
+        console.log('marketsParam', marketsParam);
+
+        const response = await fetch(
+            `/markets/greatest-incrementality-valuepool?marketType=${encodeURIComponent(marketType)}&region=${encodeURIComponent(region)}&markets=${encodeURIComponent(marketsParam)}`
+        );
+        const result = await response.json();
+
+        if (!result.success || result.data.length === 0) {
+            const canvas = document.getElementById('gratestValueChart');
+            const parent = canvas.parentElement;
+            parent.innerHTML = '<div class="alert alert-warning"><i class="fa fa-exclamation-triangle me-2"></i>No data available for selected filters.</div>';
+            return;
+        }
+
+        const labels = result.data.map(d => d.label);
+        const data = result.data.map(d => d.value);
+        const occasions = result.data.map(d => d.occasion);
+
+        // Same color mapping logic
+        const colorMap = {
+            'Connect': '#2ca02c',
+            'Savour': '#EC0089',
+            'Reward': '#035EAD',
+            'Impress': '#8B6AD8',
+            'Revel': '#F3751F',
+            'Relax': '#31B3EE',
+            'Value': '#17becf'
+        };
+        const backgroundColors = occasions.map(m => colorMap[m] || '#999');
+
+        const ctx = document.getElementById('gratestValueChart').getContext('2d');
+
+        // Destroy existing chart if it exists
+        if (greatestValueChartInstance) {
+            greatestValueChartInstance.destroy();
+        }
+
+        greatestValueChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Incremental Growth',
+                    data: data,
+                    backgroundColor: backgroundColors,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: val => val.toLocaleString()
+                        },
+                        title: {
+                            display: true,
+                            text: 'Incremental Growth',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        }
+                    }
+                }
+            }
+        });
+    } catch (err) {
+        console.error('Error loading greatest incrementality chart:', err);
+    }
+}
+
+// Function to render Mekko charts
+async function renderMekkoCharts(marketType) {
+    try {
+        console.log('Loading Mekko charts for market type:', marketType);
+
+        // Load Current Value Pool Mekko chart
+        const currentChartUrl = `/markets/mekko-chart?marketType=${encodeURIComponent(marketType)}&chartType=current`;
+        const currentFrame = document.getElementById('currentValuePoolFrame');
+        currentFrame.src = currentChartUrl;
+
+        // Load Forecasted Value Pool Mekko chart
+        const forecastedChartUrl = `/markets/mekko-chart?marketType=${encodeURIComponent(marketType)}&chartType=forecasted`;
+        const forecastedFrame = document.getElementById('forecastedValuePoolFrame');
+        forecastedFrame.src = forecastedChartUrl;
+
+        console.log('Mekko charts loaded successfully');
+    } catch (err) {
+        console.error('Error loading Mekko charts:', err);
+        document.getElementById('currentValuePoolContainer').innerHTML = '<p>Error loading Current Value Pool chart.</p>';
+        document.getElementById('forecastedValuePoolContainer').innerHTML = '<p>Error loading Forecasted Value Pool chart.</p>';
+    }
+}
+
+// Function to render Bubble chart
+async function renderBubbleChart(marketType) {
+    try {
+        console.log('Loading Bubble chart for market type:', marketType);
+
+        // Load Bubble chart
+        const bubbleChartUrl = `/markets/bubble-chart?marketType=${encodeURIComponent(marketType)}`;
+        const bubbleFrame = document.getElementById('bubbleChartFrame');
+
+        // Add loading state
+        bubbleFrame.parentElement.classList.add('bubble-chart-container');
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'bubbleChartLoading';
+        loadingDiv.className = 'bubble-chart-loading';
+        loadingDiv.innerHTML = '<div class="loading-spinner"></div><p>Loading bubble chart...</p>';
+        bubbleFrame.parentElement.appendChild(loadingDiv);
+
+        // Set the iframe source
+        bubbleFrame.src = bubbleChartUrl;
+
+        // Remove loading state when iframe loads
+        bubbleFrame.onload = function () {
+            const loader = document.getElementById('bubbleChartLoading');
+            if (loader) {
+                loader.remove();
+            }
+            console.log('Bubble chart loaded successfully');
+        };
+
+        // Handle error
+        bubbleFrame.onerror = function () {
+            const loader = document.getElementById('bubbleChartLoading');
+            if (loader) {
+                loader.remove();
+            }
+            bubbleFrame.parentElement.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle me-2"></i>Error loading Bubble chart.</div>';
+        };
+
+    } catch (err) {
+        console.error('Error loading Bubble chart:', err);
+        const bubbleContainer = document.getElementById('bubbleChartFrame').parentElement;
+        bubbleContainer.innerHTML = '<div class="alert alert-danger"><i class="fa fa-exclamation-circle me-2"></i>Error loading Bubble chart.</div>';
+    }
+}
+
+// ============================================
+// ENSEMBLE WEIGHT SELECTION FUNCTIONALITY
+// ============================================
+
+// Helper functions for graph visibility
+function hideAllGraphs() {
+    document.getElementById('FutureValue').classList.remove('in');
+    document.getElementById('GreatestValuepool').classList.remove('in');
+    document.getElementById('MekkoCharts').classList.remove('in');
+    document.getElementById('BubbleChart').classList.remove('in');
+}
+
+function showAllGraphs() {
+    document.getElementById('FutureValue').classList.add('in');
+    document.getElementById('GreatestValuepool').classList.add('in');
+    document.getElementById('MekkoCharts').classList.add('in');
+    document.getElementById('BubbleChart').classList.add('in');
+}
+
+function showEnsembleQuestion() {
+    document.getElementById('ensembleQuestion').style.display = 'block';
+}
+
+function hideEnsembleQuestion() {
+    document.getElementById('ensembleQuestion').style.display = 'none';
+}
+
+// Ensemble "No" button handler - use default data and show all graphs
+document.addEventListener('DOMContentLoaded', () => {
+    const ensembleNoBtn = document.getElementById('ensembleNoBtn');
+    if (ensembleNoBtn) {
+        ensembleNoBtn.addEventListener('click', async () => {
+            hideEnsembleQuestion();
+
+            const { marketType, region, marketsParam } = window.currentFilterState || {};
+            if (!marketType || !region || !marketsParam) {
+                showFlashMessage('Filter state not found. Please apply filter again.', 'warning', 5000);
+                return;
+            }
+
+            // Load all graphs with default data
+            await renderIncrementalChart(marketType);
+            await renderFutureValueChart(marketType, region, marketsParam);
+            await rendergreatestIncrementalityValuepoolChart(marketType, region, marketsParam);
+            await renderMekkoCharts(marketType);
+            await renderBubbleChart(marketType);
+
+            // Show all graph sections
+            showAllGraphs();
+        });
+    }
+});
+
+// Ensemble "Yes" button handler - open modal
+document.addEventListener('DOMContentLoaded', () => {
+    const ensembleYesBtn = document.getElementById('ensembleYesBtn');
+    if (ensembleYesBtn) {
+        ensembleYesBtn.addEventListener('click', () => {
+            const { selectedMarkets } = window.currentFilterState || {};
+            if (!selectedMarkets || selectedMarkets.length === 0) {
+                showFlashMessage('No markets selected. Please apply filter again.', 'warning', 5000);
+                return;
+            }
+
+            // Populate modal with ensemble selectors
+            populateEnsembleSelectors(selectedMarkets);
+
+            // Open modal
+            const modal = new bootstrap.Modal(document.getElementById('ensembleModal'));
+            modal.show();
+        });
+    }
+});
+
+// Populate ensemble selectors in modal
+function populateEnsembleSelectors(markets) {
+    const container = document.getElementById('ensembleSelectors');
+    container.innerHTML = '';
+
+    markets.forEach(market => {
+        const selectorDiv = document.createElement('div');
+        selectorDiv.className = 'ensemble-selector mb-3 p-3 border rounded';
+        selectorDiv.innerHTML = `
+            <h6 class="mb-2"><i class="fa fa-map-marker me-2"></i>${market}</h6>
+            <select class="form-select ensemble-weight-select" data-market="${market}">
+                <option value="">-- Skip (Use Default) --</option>
+                <option value="100-0">100-0</option>
+                <option value="75-25">75-25</option>
+                <option value="50-50">50-50</option>
+            </select>
+        `;
+        container.appendChild(selectorDiv);
+
+        // Add change event listener
+        const select = selectorDiv.querySelector('.ensemble-weight-select');
+        select.addEventListener('change', (e) => handleEnsembleWeightChange(e));
+    });
+}
+
+// Handle ensemble weight selection change
+async function handleEnsembleWeightChange(event) {
+    const market = event.target.dataset.market;
+    const ensembleWeight = event.target.value;
+
+    if (!ensembleWeight) {
+        // User selected "Skip" - clear preview for this market
+        clearPreviewForMarket(market);
+        return;
+    }
+
+    // Show loading state
+    const previewContent = document.getElementById('ensemblePreviewContent');
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = `loading-${market}`;
+    loadingDiv.className = 'text-center my-3';
+    loadingDiv.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Loading preview...';
+    previewContent.appendChild(loadingDiv);
+
+    try {
+        // Fetch data for this specific ensemble weight
+        const { marketType, region } = window.currentFilterState;
+        const response = await fetch(
+            `/markets/ensemble-category-result?` +
+            `marketType=${encodeURIComponent(marketType)}&` +
+            `region=${encodeURIComponent(region)}&` +
+            `markets=${encodeURIComponent(market)}&` +
+            `ensembleWeight=${encodeURIComponent(ensembleWeight)}`
+        );
+        const result = await response.json();
+
+        // Remove loading indicator
+        const loader = document.getElementById(`loading-${market}`);
+        if (loader) loader.remove();
+
+        if (result.success) {
+            displayPreviewData(market, ensembleWeight, result.data);
+        } else {
+            showFlashMessage(`Error loading preview: ${result.message}`, 'danger', 5000);
+        }
+    } catch (error) {
+        console.error('Error fetching ensemble preview:', error);
+        const loader = document.getElementById(`loading-${market}`);
+        if (loader) loader.remove();
+        showFlashMessage('Error loading preview data', 'danger', 5000);
+    }
+}
+
+// Display preview data for a market
+function displayPreviewData(market, ensembleWeight, data) {
+    const previewContent = document.getElementById('ensemblePreviewContent');
+
+    // Remove existing preview for this market
+    const existingPreview = document.getElementById(`preview-${market}`);
+    if (existingPreview) {
+        existingPreview.remove();
+    }
+
+    // Create new preview section
+    const previewSection = document.createElement('div');
+    previewSection.id = `preview-${market}`;
+    previewSection.className = 'preview-section mb-3 p-3 border rounded bg-light';
+
+    if (data.length === 0) {
+        previewSection.innerHTML = `
+            <h6 class="text-warning"><i class="fa fa-exclamation-triangle me-2"></i>${market} - Ensemble Weight: ${ensembleWeight}</h6>
+            <p class="text-muted mb-0">No data available for this selection</p>
+        `;
+    } else {
+        const headers = Object.keys(data[0]);
+        const displayRows = data.slice(0, 5); // Show only first 5 rows
+
+        previewSection.innerHTML = `
+            <h6 class="text-success"><i class="fa fa-check-circle me-2"></i>${market} - Ensemble Weight: ${ensembleWeight}</h6>
+            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <table class="table table-sm table-striped">
+                    <thead class="table-dark">
+                        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${displayRows.map(row => `
+                            <tr>${headers.map(h => `<td>${row[h]}</td>`).join('')}</tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-muted mb-0 mt-2">
+                <i class="fa fa-info-circle me-2"></i>Showing ${displayRows.length} of ${data.length} rows
+            </p>
+        `;
+    }
+
+    previewContent.appendChild(previewSection);
+}
+
+// Clear preview for a specific market
+function clearPreviewForMarket(market) {
+    const preview = document.getElementById(`preview-${market}`);
+    if (preview) {
+        preview.remove();
+    }
+}
+
+// Confirm button handler - execute R script and refresh
+document.addEventListener('DOMContentLoaded', () => {
+    const confirmBtn = document.getElementById('confirmEnsembleBtn');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', async () => {
+            // Collect all ensemble selections
+            const ensembleSelections = {};
+            const selectors = document.querySelectorAll('.ensemble-weight-select');
+
+            selectors.forEach(select => {
+                const market = select.dataset.market;
+                const weight = select.value;
+
+                if (weight) {  // Only include if not "Skip"
+                    ensembleSelections[market] = weight;
+                }
+            });
+
+            // Validate at least one selection
+            if (Object.keys(ensembleSelections).length === 0) {
+                showFlashMessage('Please select at least one ensemble weight or click "No, use default"', 'warning', 5000);
+                return;
+            }
+
+            // Disable button and show loading
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Processing...';
+
+            try {
+                // Call R script
+                const { marketType } = window.currentFilterState;
+                const response = await fetch('/markets/execute-ensemble-script', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        marketType,
+                        ensembleSelections
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('ensembleModal'));
+                    modal.hide();
+
+                    // Refresh the entire report
+                    await refreshReport();
+
+                    showFlashMessage('Ensemble weights applied successfully!', 'success', 5000);
+                } else {
+                    showFlashMessage(`Failed to apply ensemble weights: ${result.message}`, 'danger', 5000);
+                }
+            } catch (error) {
+                console.error('Error executing R script:', error);
+                showFlashMessage('Error executing R script. Please try again.', 'danger', 5000);
+            } finally {
+                // Re-enable button
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fa fa-check me-2"></i>Confirm & Apply';
+            }
+        });
+    }
+});
+
+// Refresh report with updated data
+async function refreshReport() {
+    const { marketType, region, selectedMarkets, marketsParam } = window.currentFilterState;
+
+    // Re-fetch all data
+    const response = await fetch(
+        `/markets/final-category-result?marketType=${encodeURIComponent(marketType)}&region=${encodeURIComponent(region)}&markets=${encodeURIComponent(marketsParam)}`
+    );
+    const result = await response.json();
+
+    if (result.success && result.data.length > 0) {
+        renderTable(result.data);
+    }
+
+    // Show all graphs
+    await renderIncrementalChart(marketType);
+    await renderFutureValueChart(marketType, region, marketsParam);
+    await rendergreatestIncrementalityValuepoolChart(marketType, region, marketsParam);
+    await renderMekkoCharts(marketType);
+    await renderBubbleChart(marketType);
+
+    // Expand all graph sections
+    showAllGraphs();
+
+    // Hide ensemble question
+    hideEnsembleQuestion();
+}

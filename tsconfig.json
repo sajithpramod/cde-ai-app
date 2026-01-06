@@ -1,0 +1,75 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2020",
+    "lib": ["ES2020"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    /* Type Checking */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+
+    /* Emit */
+    "outDir": "./dist",
+    "rootDir": "./",
+    "removeComments": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    /* Interop Constraints */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+
+    /* Skip Lib Check */
+    "skipLibCheck": true,
+
+    /* Advanced */
+    "allowJs": true,
+    "checkJs": false,
+    "incremental": true,
+    "types": ["node", "jest"]
+  },
+  "include": [
+    "server.ts",
+    "types/**/*.ts",
+    "controllers/**/*.ts",
+    "routes/**/*.ts",
+    "services/**/*.ts",
+    "middlewares/**/*.ts",
+    "utils/**/*.ts",
+    "config/**/*.ts",
+    "configs/**/*.ts",
+    "__tests__/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "public",
+    "scripts",
+    "migrations",
+    "seeds",
+    "uploads",
+    "temp-uploads"
+  ],
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true
+  }
+}

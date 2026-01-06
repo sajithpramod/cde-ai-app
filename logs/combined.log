@@ -1,0 +1,18 @@
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","timestamp":"2025-12-23 10:22:10"}
+{"level":"info","message":"SIGINT signal received: closing HTTP server","timestamp":"2025-12-23 10:50:47"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","timestamp":"2025-12-23 10:50:48"}
+{"ip":"::1","level":"warn","message":"404 Not Found","path":"/.well-known/appspecific/com.chrome.devtools.json","timestamp":"2025-12-26 04:20:22"}
+{"ip":"::1","level":"warn","message":"404 Not Found","path":"/dist/bundle.js.map","timestamp":"2025-12-26 04:20:23"}
+{"ip":"::1","level":"warn","message":"404 Not Found","path":"/boostrap/bootstrap.min.css.map","timestamp":"2025-12-26 04:20:23"}
+{"ip":"::1","level":"warn","message":"404 Not Found","path":"/auth/login","timestamp":"2025-12-26 04:20:32"}
+{"ip":"::1","level":"warn","message":"404 Not Found","path":"/.well-known/appspecific/com.chrome.devtools.json","timestamp":"2025-12-26 04:20:32"}
+{"ip":"::1","level":"warn","message":"404 Not Found","path":"/boostrap/bootstrap.min.css.map","timestamp":"2025-12-26 04:20:32"}
+{"ip":"::1","level":"warn","message":"404 Not Found","path":"/.well-known/appspecific/com.chrome.devtools.json","timestamp":"2025-12-26 04:20:34"}
+{"ip":"::1","level":"warn","message":"404 Not Found","path":"/boostrap/bootstrap.min.css.map","timestamp":"2025-12-26 04:20:34"}
+{"ip":"::1","level":"warn","message":"404 Not Found","path":"/auth/login","timestamp":"2025-12-26 06:46:40"}
+{"level":"info","message":"SIGTERM signal received: closing HTTP server","timestamp":"2026-01-02 12:58:44"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":3000,"timestamp":"2026-01-02 12:59:47"}
+{"level":"info","message":"SIGINT signal received: closing HTTP server","timestamp":"2026-01-02 13:01:32"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":3000,"timestamp":"2026-01-05 12:40:15"}
+{"level":"info","message":"SIGTERM signal received: closing HTTP server","timestamp":"2026-01-05 12:40:15"}
+{"level":"info","message":"SIGTERM signal received: closing HTTP server","timestamp":"2026-01-05 12:40:15"}

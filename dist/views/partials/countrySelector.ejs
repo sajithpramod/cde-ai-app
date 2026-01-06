@@ -1,0 +1,11 @@
+<form id="countryForm" action="/reports" method="get">
+  <span class="link_name">Select Market</span>
+    <select id="countrySelect" name="country" title="Market" class="countrySelect">
+      <% countries.forEach(country => { %>
+        <option
+          value="<%= country %>"
+          <%= country === selectedCountry ? 'selected' : '' %>
+        ><%= country %></option>
+      <% }) %>
+    </select>
+  </form>

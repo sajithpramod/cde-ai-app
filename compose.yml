@@ -1,0 +1,43 @@
+services:
+  app:
+    build: .
+    container_name: app
+    env_file: .env
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+    # Container log limits to prevent disk space issues
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"      # Maximum size of each log file
+        max-file: "3"        # Maximum number of log files to keep
+        compress: "true"     # Compress rotated log files
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    depends_on:
+      - app
+    networks:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl/server.crt:/etc/ssl/certs/server.crt:ro
+      - ./ssl/server.key:/etc/ssl/private/server.key:ro
+    restart: always
+    # Container log limits for nginx
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"       # Nginx logs are usually smaller
+        max-file: "3"
+        compress: "true"
+
+networks:
+  backend:

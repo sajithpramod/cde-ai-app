@@ -1,0 +1,15 @@
+<!-- views/partials/mekko.ejs -->
+<div
+  id="mekkoChartContainer-<%= id %>"
+  class="mekko-chart"
+  style="width: 100%; height: 500px;"
+  data-title="<%= title %>"
+  data-key="<%= id %>"
+></div>
+
+<script
+  type="application/json"
+  id="mekko-data-<%= id %>"
+>
+  <%= JSON.stringify(mekkoData || []) %>
+</script>

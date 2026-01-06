@@ -1,0 +1,1615 @@
+<body>
+  <%
+          function getTierColumnBg(name) {
+            switch (name) {
+              case 'Relax':
+              return 'Relax-bg';
+              case 'Reward':
+              return 'Reward-bg';
+              case 'Savour':
+              return 'Savour-bg';
+              case 'Revel':
+              return 'Revel-bg';
+              case 'Connect':
+              return 'Connect-bg';
+              case 'Impress':
+              return 'Impress-bg';
+              default:
+                return '';
+            }
+          }
+      %>
+  <article>
+    <header>
+      <div class="headerlogo"><img src="images/logo.png" alt="" /><span class="navtittile">Occasion-Motivation Forecasting</span></div>
+ .        
+          
+ <div class="rightnav">
+  <div id="menuBtn">
+      <span class="menuline-1"></span>
+      <span class="menuline-2"></span>
+      <span class="menuline-1"></span>
+</div>
+<nav id="sideNav">
+          <div >
+            <%- 
+              include('partials/countrySelector', { 
+              countries: countries, 
+              selectedCountry: selectedCountry }) 
+            %>
+
+        </div> 
+          <div >
+          <a id="downloadReportBtn"  class="btn btn-primary">
+            Download Report (Excel)
+          </a>
+        </div>
+          <!-- <div>
+          <a href="#" class="btn btn-primary">
+            Publish Report
+          </a>
+          </div>   -->
+          <div>
+          <a class="btn btn-primary"  style="text-align: center;" data-toggle="modal" data-target="#publish">
+            Publish Report
+          </a>
+        </div>
+
+          <div class="call-back">
+          <a href="/dashboard" class="btn btn-outline-primary">
+           Back to Dashboard
+          </a>
+          </div>
+          <div class="call-back" style="margin-top: 10px;">
+          <a href="/auth/logout" class="btn btn-danger">
+            <i class="fa fa-sign-out"></i> Logout
+          </a>
+          </div>
+        </nav>
+    </div>
+             <!-- Dashboard Button -->
+    </header>
+ <!-- <div class="left-navigation">
+  <div class="tabmenu">
+
+<ul class="nav nav-tabs">
+  <li>  <%- include('partials/countrySelector', { 
+    countries: countries, 
+    selectedCountry: selectedCountry 
+ }) %>
+</li>
+  <li class="active"><a data-toggle="tab" href="#home">Theory - Scenarios</a></li>
+  <li><a data-toggle="tab" href="#serves">Serves</a></li>
+  <li><a data-toggle="tab" href="#menu2">Final Modal</a></li>
+  <li><a data-toggle="tab" href="#menu1">Mekko Charts</a></li>
+</ul>
+
+</div>
+</div>    -->
+
+<!-- side menu start here -->
+<div class="sidebar close">
+  <i class='btn-menu bx-menu'><span></span></i>
+
+<ul class="nav-links">
+  <li class="active">
+    <div class="icon-link">
+      <a  data-toggle="tab" href="#aboutforcasting">
+        <span class='bx bx-bulb'><img src="images/home.png" alt="" /></span>
+        <span class="link_name">Introduction</span>
+      </a>
+    </div>
+  </li>
+
+
+
+ <li>
+  <div class="icon-link">
+    <a data-toggle="tab" href="#menu2">
+      <span class='bx bx-bulb'><img src="images/final-model.png" alt="" /></span>
+      <span class="link_name">Final Model</span>
+    </a>
+    <i class='bx bxs-chevron-down arrow'></i>
+  </div>
+</li>
+<li>
+  <div class="icon-link">
+    <a data-toggle="tab" href="#serves">
+      <span class='bx bx-bulb'><img src="images/serves.png" alt="" /></span>
+      <span class="link_name">Serves</span>
+    </a>
+    <i class='bx bxs-chevron-down arrow'></i>
+  </div>
+</li>
+<li>
+  <div class="icon-link">
+    <a data-toggle="tab" href="#menu1">
+      <span class='bx bx-bulb'><img src="images/mekko-charts.png" alt="" /></span>
+      <span class="link_name">Mekko Charts</span>
+    </a>
+    <i class='bx bxs-chevron-down arrow'></i>
+  </div>
+</li>
+<li>
+  <div class="icon-link">
+    <a  data-toggle="tab" href="#home">
+      <span class='bx bx-bulb'><img src="images/sheory-scenarios.png" alt="" /></span>
+      <span class="link_name">Scenarios: Theory</span>
+    </a>
+  </div>
+</li>
+</ul>
+
+</div>
+<!-- side menu end here -->
+
+<div id="weightsModal" class="modal weightsModal">
+  <div class="modal-content">
+    <h4>Update Ensemble Weights</h4>
+    <form id="weightsForm">
+      <label for="topdown">Top-down Weight (%)</label>
+      <input type="number" id="topdown" name="topdown" min="0" max="100" required> <br><br>
+
+      <label for="bottomup">Bottom-up Weight (%)</label>
+      <input type="number" id="bottomup" name="bottomup" min="0" max="100" required> <br><br>
+
+      <button type="submit" class="btn btn-success">Submit</button>
+      <button type="button" id="closeModal" class="btn btn-secondary">Cancel</button>
+    </form>
+    <p id="errorMsg" class="error-msg">Total must be ≤ 100</p>
+    <div id="successMsg" class="success-msg"></div> 
+  </div>
+</div>
+
+<section class="chartmaincontainer">
+  <div class="container-fluid">
+    
+      <div class="chartcontainer">
+<div class="tab-content">
+  <div id="aboutforcasting" class="tab-pane fade in active">
+    <h1 class="mainhd"> Introduction to your Value Pools forecast</h1>
+   
+    <p> Congratulations, you've created your forecasts for your Value Pools!</p>
+     <p> Here is an overview of what you will find on this site and how to use the data generated. Please navigate this site using the menu on the left-hand side of the page.
+</p>
+
+<div class="aboutforcasting">
+<div class="col-md-12 d-flex">
+  <div class="col-md-6">
+    <div class="d-container">
+    <div class="aboutimg"><img src="images/final-model.png" alt="final-model" /></div>
+    <h3>Final Forecast Model</h3>
+    <p>This is where you will find the following data:</p>
+    <div class="liststyle">
+    <ul>
+      <li><span>Current TBA Value Pools</span></li>
+      <li><span>Current TBA Value Pools: Heat Map</span></li>
+      <li><span>Current   Value Pools</span></li>
+      <li><span>Current   Value Pools: Heat Map</span></li>
+      <li><span>Forecasted TBA Value Pools</span></li>
+      <li><span>Forecasted TBA Value Pools: Heat Map</span></li>
+      <li><span>Absolute change in share (Current vs Forecasted) by Value Pool</span></li>
+    </ul>
+  </div>
+  <p>You will also be able to generate your Decision Matrix of Value Pools on this page, to review and scrutinise the full set of Value Pools 
+and their Scenario results.
+</p>
+<button class="btn golink hover"><a data-toggle="tab" href="#menu2"><img src="images/go.png" alt="go" /></a></button>
+
+</div>
+</div>
+   <div class="col-md-6">
+     <div class="d-container">
+    <div class="aboutimg"><img src="images/mekko-charts.png" alt="final-model" /></div>
+    <h3>Mekko Charts</h3>
+    <p>This is where you can find the three Mekko charts that visualise how your market is comprised by Value Pools. There are three views:</p>
+    <div class="liststyle">
+    <ul>
+      <li><span>Current TBA Value Pools</span></li>
+      <li><span>Future TBA Value Pools</span></li>
+      <li><span>Current   Value Pools</span></li>
+    </ul>
+  </div>
+   <p>You will also be able to download these charts as a PPTX document.</p>
+<button class="btn golink hover"><a data-toggle="tab" href="#menu1"><img src="images/go.png" alt="go" /></a></button>
+
+</div></div>
+
+</div>
+
+<div class="col-md-12 d-flex mt-8">
+  <div class="col-md-6">
+    <div class="d-container">
+    <div class="aboutimg"><img src="images/sheory-scenarios.png" alt="final-model" /></div>
+    <h3>Scenarios Theory</h3>
+    <p> To build a robust understanding of the headroom for growth, our forecasting model assesses three different scenarios.</p>
+    <div class="liststyle">
+      <ul>
+        <li><span>Scenario A:What's the headroom for  , assuming our share remains the same and we grow through category tailwinds?</span></li>
+        <li><span>Scenario B: What's the theoretical headroom for  , assuming we had 100% share of the future value pool size?</span></li>
+        <li><span>Scenario C: What's the maximum headroom for growth, for the TBA category?</span></li>
+        <li><span>The Scenarios: Theory page will provide an overview of what each of these three scenarios is and what each output means.</span></li>
+      </ul>
+     </div>
+  
+   <p>You'll find the outputs for how the model has assessed each scenario within the Decision Matrix. The Decision Matrix can be found in 
+the Final Forecast Model tab.</p>
+<button class="btn golink hover"><a data-toggle="tab" href="##home"><img src="images/go.png" alt="go" /></a></button>
+</div>
+</div>
+   <div class="col-md-6">
+     <div class="d-container">
+    <div class="aboutimg"><img src="images/serves.png" alt="final-model" /></div>
+    <h3>Occasions forecasting methodology</h3>
+</div></div>
+
+</div>
+
+</div>
+  </div>
+  <div id="home" class="tab-pane fade">
+    <h1 class="mainhd">Theory Scenarios</h1>
+    <p>Within your Decision Matrix (found in the Final Forecast Model tab), you'll see the output of how the model has assessed the headroom for growth under the three
+      scenarios (A, B and C). Below is an explainer of the three scenarios that the model has assessed. ​</p>
+      <div class="theorybanner"><img src="images/banner.png" alt="" /></div>
+      <div class="theorybanner"><img src="images/theory1.png" alt="" /></div>
+  </div>
+  <div id="menu1" class="tab-pane fade">
+    <div class="mekkochart">
+          <h1 class="mainhd">Mekko charts</h1>
+    <ul class="nav nav-tabs">
+  <li class="active"><a data-toggle="tab" href="#Current-TBA">Current TBA Value Pools</a></li>
+  <li><a data-toggle="tab" href="#Future-TBA">Future TBA Value Pools</a></li>
+  <li><a data-toggle="tab" href="# ">  Current Value Pools</a></li>
+</ul>
+
+<div class="tab-content">
+
+  
+
+  <div id="Current-TBA" class="tab-pane fade in active">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row"> 
+        <div class="col-md-9">
+        <h1>Current TBA Value Pools</h1>
+        <div class="chart-border">
+          <div id="chart1">
+         <%- mekkochart1 %>
+        </div>
+        <div id="loadingSpinner">Loading chart...</div>
+         <iframe id="mekkoFrame" width="100%" height="600" class="framStyle hidden"></iframe>
+        </div>
+        </div>
+        <div class="col-md-3">
+          <!-- Table 1: Occasion Motivation -->
+          <div class="card p-3 mb-3 mt-10">
+            <h4>Occasion Motivations</h4>
+            <% const OmSummTba = data['OM_summ_tba']; %>
+            <% if (OmSummTba && OmSummTba.length > 0) { %>
+            <table class="table table-sm table-striped" id="OM_summ_tba">
+              <tbody>
+                <% OmSummTba.forEach(row => {
+                  const firstCol = row['Occasion_Motivation'].charAt(0).toUpperCase() + row['Occasion_Motivation'].slice(1).toLowerCase();
+                %>
+                <tr>
+                  <td class="<%= getTierColumnBg(firstCol) %>"><%= firstCol %></td>
+                  <td><%= row['Share']%></td>
+                </tr>
+                <% }) %>
+              </tbody>
+              <% } %>
+            </table>
+          </div>
+    
+          <!-- Table 2: Price Tier -->
+          <div class="card p-3">
+            <h4>Value Pools</h4>
+            <table class="table table-sm table-striped" id="PT_summ_tba">
+              <% const PtSummTba = data['PT_summ_tba']; %>
+              <% if (PtSummTba && PtSummTba.length > 0) { %>
+              <tbody>
+                <% PtSummTba.forEach(row => { %>
+                <tr>
+                  <td><%= row['price.tier'] %></td>
+                  <td><%= row['Shares'] %></td>
+                </tr>
+                <% }) %>
+              </tbody>
+              <% } %> 
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+      <!-- Right side: Two tables stacked vertically -->
+   
+      </div>
+  </div>
+  <div id="Future-TBA" class="tab-pane fade">
+    <div class="row">
+      <div class="col-md-12">
+      <div class="row"> 
+        <div class="col-md-9">
+       <h1>Future TBA Value Pools</h1>
+       <div class="chart-border">
+       <div id="chart2">
+       <%- mekkochart2 %>
+      </div>
+      <div id="loadingSpinner1">Loading chart...</div>
+       <iframe id="mekkoFrame1" width="100%" height="600" class="framStyle hidden"></iframe>
+      </div>
+      </div>
+      <div class="col-md-3">
+        <!-- Table 1: Occasion Motivation -->
+        <div class="card p-3 mb-3 mt-10">
+          <h4>Occasion Motivations</h4>
+          <% const OmSummChng = data['OM_summ_chng']; %>
+          <% if (OmSummChng && OmSummChng.length > 0) { %>
+          <table class="table table-sm table-striped" id="OM_summ_chng">
+            <thead>
+                <th></th>
+                <th>TBA</th>
+                <th>%Change</th>
+             </thead>
+
+            <tbody>
+              <% OmSummChng.forEach(row => {
+                const firstCol = row['Occasion_Motivation'].charAt(0).toUpperCase() + row['Occasion_Motivation'].slice(1).toLowerCase();
+              %>
+              <tr>
+                <td class="<%= getTierColumnBg(firstCol) %>"><%= firstCol %></td>
+                <td><%= row['TBA'] %></td>
+                <td><%= row['%Chng'] %></td>
+
+              </tr>
+              <% }) %>
+            </tbody>
+            <% } %>
+          </table>
+        </div>
+  
+        <!-- Table 2: Price Tier -->
+        <div class="card p-3">
+          <h4>Value Pools</h4>
+          <table class="table table-sm table-striped" id="PT_summ_chng">
+            <% const PtSummChng = data['PT_summ_chng']; %>
+            <% if (PtSummChng && PtSummChng.length > 0) { %>
+              <thead>
+                <th></th>
+                <th>TBA</th>
+                <th>%Change</th>
+             </thead>  
+            <tbody>
+              <% PtSummChng.forEach(row => { %>
+              <tr>
+                <td><%= row['price.tier'] %></td>
+                <td><%= row['TBA'] %></td>
+                <td><%= row['%Chng'] %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+            <% } %> 
+          </table>
+        </div> 
+    </div> 
+  </div>
+</div>   
+    
+   </div>   
+  </div>
+
+  <div id=" " class="tab-pane fade">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row"> 
+          <div class="col-md-9">
+        <h1>  Current Value Pools</h1>
+        <div class="chart-border">
+          <div id="chart3">
+           <%- mekkochart3 %>
+          </div>
+          <div id="loadingSpinner2">Loading chart...</div>
+        <iframe id="mekkoFrame2" width="100%" height="600" class="framStyle hidden"></iframe>
+        </div>
+      </div> 
+      <div class="col-md-3">
+      <div class="card p-3 mb-3 mt-10">
+        <!-- Table 1: Occasion Motivation -->
+         <div class="card p-3 mb-3">
+           <h4>Occasion Motivations</h4>
+           <% const OmSummDg = data['OM_summ_dg']; %>
+           <% if (OmSummDg && OmSummDg.length > 0) { %>
+           <table class="table table-sm table-striped" id="OM_summ_dg">
+            <thead>
+              <th></th>
+              <th>TBA</th>
+              <th> </th>
+           </thead>  
+         
+             <tbody>
+               <% OmSummDg.forEach(row => {
+                 const firstCol = row['Occasion_Motivation'].charAt(0).toUpperCase() + row['Occasion_Motivation'].slice(1).toLowerCase();
+               %>
+               <tr>
+                 <td class="<%= getTierColumnBg(firstCol) %>"><%= firstCol %></td>
+                 <td><%= row['TBA'] %></td>
+                 <td><%= row[' '] %></td>
+               </tr>
+               <% }) %>
+             </tbody>
+             <% } %>
+           </table>
+         </div>
+ 
+         <!-- Table 2: Price Tier -->
+         <div class="card p-3">
+           <h4>Value Pools</h4>
+           <table class="table table-sm table-striped" id="PT_summ_dg">
+             <% const PtSummDg = data['PT_summ_dg']; %>
+             <% if (PtSummDg && PtSummDg.length > 0) { %>
+              <thead>
+                <th></th>
+                <th>TBA</th>
+                <th> </th>
+             </thead> 
+             <tbody>
+               <% PtSummDg.forEach(row => { %>
+               <tr>
+                 <td><%= row['price.tier'] %></td>
+                 <td><%= row['TBA'] %></td>
+                 <td><%= row[' '] %></td>
+               
+               </tr>
+               <% }) %>
+             </tbody>
+             <% } %> 
+           </table>
+       </div> 
+    
+      </div>   
+      </div>
+     </div>
+     </div>
+    
+     
+  </div>
+ </div> 
+  <button id="exportPPT">Download PPTX</button>
+  <div id="exportStatus" style="margin-top: 10px; font-weight: bold;"></div>
+</div>
+
+
+   </div>
+  </div>
+  <div id="menu2" class="tab-pane fade">
+  
+  <h1 class="mainhd">Final Model</h1>
+ 
+
+        <div class="tablehd">
+<button class="mekkochartmodal btn" data-toggle="modal" data-target="#mekkomodal">Decision Matrix</button>
+</div>
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+        Current TBA Value Pools​ <i class="fa fa-angle-up align-right " aria-hidden="true"></i>
+    </a>
+      </h4>
+    </div>
+    <div id="collapse1" class="panel-collapse collapse in">
+      <div class="panel-body">
+        <% const tbaRsv = data['TBA_RSV_Output']; %>
+        <% if (tbaRsv && tbaRsv.length > 0) { %>
+          <div class="table-responsive">
+       <table class="table table-hover tbyllow" id="TBA_RSV_Output">
+        <% const cols = Object.keys(tbaRsv[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+   
+    <tbody>
+      <% tbaRsv.forEach(row => { %>
+        <tr>
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td>
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  </div>
+  <% } else { %>
+    <p>No data found for TBA RSV</p>
+  <% } %>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
+        Current TBA Value Pools: Heat Map​ <i class="fa fa-angle-up align-right " aria-hidden="true"></i></a>
+      </h4>
+    </div>
+    <div id="collapse2" class="panel-collapse collapse">
+      <div class="panel-body">
+        <% const currentValuePool = data['Current Value Pool Heat Map']; %>
+        <% if (currentValuePool && currentValuePool.length > 0) { %>
+          <div class="table-responsive">
+                <table class="table table-hover" id="Current-Value-Pool-Heat-Map">
+                  <% const cols = Object.keys(currentValuePool[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% currentValuePool.forEach(row => { %>
+        <tr>
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td>
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+  
+        </tr>
+        <% }) %>
+          
+    </tbody>
+    <% } else { %>
+      <p>Current Value Pool Heat Map</p>
+    <% } %>
+  </table>
+  </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse5">
+        Current   Value Pools <i class="fa fa-angle-up align-right " aria-hidden="true"></i></a>
+      </h4>
+    </div>
+    <div id="collapse5" class="panel-collapse collapse">
+      <div class="panel-body">
+        <% const  RsvOutput = data[' _RSV_Output']; %>
+        <% if ( RsvOutput &&  RsvOutput.length > 0) { %>
+          <div class="table-responsive">
+           <table class="table table-hover" id=" _RSV_Output">
+            <% const cols = Object.keys( RsvOutput[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <%  RsvOutput.forEach(row => { %>
+        <tr>
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td>
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+  
+        </tr>
+        <% }) %>
+    </tbody>
+    <% } else { %>
+      <p>  RSV by Value Pool </p>
+    <% } %>
+  </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse6">
+        Current   Value Pools: Heat Map <i class="fa fa-angle-up align-right " aria-hidden="true"></i></a>
+      </h4>
+    </div>
+    <div id="collapse6" class="panel-collapse collapse">
+      <div class="panel-body">
+        <% const  ValuePoolHeatMap = data['  Value Pool Heat Map']; %>
+        <% if ( ValuePoolHeatMap &&  ValuePoolHeatMap.length > 0) { %>
+          <div class="table-responsive">
+
+        <table class="table table-hover" id=" -Value-Pool-Heat-Map">
+        <% const cols = Object.keys( ValuePoolHeatMap[0]); %> 
+        <thead>
+          <tr>
+            <% cols.forEach((col, index) => { 
+              const label = col
+                .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+                .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+                .split(' ')
+                .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(' ');
+            %>
+            <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+            <% }) %>
+          </tr>
+        </thead>
+        <tbody>
+          <%  ValuePoolHeatMap.forEach(row => { %>
+            <tr>
+              <% Object.entries(row).forEach(([key, value]) => { %>
+                <td>
+                  <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+                </td>
+              <% }) %>
+      
+            </tr>
+            <% }) %>
+              
+        </tbody>
+        <% } else { %>
+          <p>Current Value Pool Heat Map</p>
+        <% } %>
+      </table>
+      </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <h4 class="panel-title" >
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse7">
+        Forecasted TBA Value Pools<i class="fa fa-angle-up align-right " aria-hidden="true"></i></a>
+    
+      </h4>
+    </div>
+    <div id="collapse7" class="panel-collapse collapse">
+      <div class="panel-body">
+          
+        
+        <% const ForecastShares = data['Forecasted RSV']; %>
+        <% if (ForecastShares && ForecastShares.length > 0) { %>
+          <div class="table-responsive">
+          <table class="table table-hover" id="Forecasted-RSV">
+            <% const cols = Object.keys(ForecastShares[0]); %>
+      
+       <thead>
+       
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% ForecastShares.forEach(row => { %>
+      
+        <tr >
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td>
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+         </tr>
+         
+
+
+       
+        <% }) %>
+          
+    </tbody>
+    <% } else { %>
+      <p>Current Value Pool Heat Map</p>
+    <% } %>
+  </table>
+  </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">
+        Forecasted TBA Value Pools: Heat Map <i class="fa fa-angle-up align-right " aria-hidden="true"></i></a>
+      </h4>
+    </div>
+    <div id="collapse4" class="panel-collapse collapse">
+      <div class="panel-body">
+        <% const forcastValuePool = data['Forecasted value pool heat map']; %>
+        <% if (forcastValuePool && forcastValuePool.length > 0) { %>
+          <div class="table-responsive">
+           <table class="table table-hover" id="Forecasted-value-pool-heat-map">
+            <% const cols = Object.keys(forcastValuePool[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% forcastValuePool.forEach(row => { %>
+        <tr>
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td>
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+  
+        </tr>
+        <% }) %>
+          
+  
+    </tbody>
+    <% } else { %>
+      <p>Forecasted Value Pool Heat Map </p>
+    <% } %>
+  </table>
+  </div>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
+        Absolute change in share (Current vs Forecasted) by Value Pool <i class="fa fa-angle-up align-right " aria-hidden="true"></i></a>
+      </h4>
+    </div>
+    <div id="collapse3" class="panel-collapse collapse">
+      <div class="panel-body">
+        <div class="updateWeightsBtnrow">
+          <span>If the deviation of the value pool % is more than anticipated, please update the ensemble weights</span>
+          <button id="updateWeightsBtn" class="btn btn-primary updateWeightsBtn">Update Ensemble Weights</button>
+        </div>
+        <% const absoluteChange = data['Absolute Change in Share by Value Pool']; %>
+        <% if (absoluteChange && absoluteChange.length > 0) { %>
+          <div class="table-responsive">
+          <table class="table table-hover" id="Absolute-Change-in-Share-by-Value-Pool">
+            <% const cols = Object.keys(absoluteChange[0]); %>
+      
+       <thead>
+       
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% absoluteChange.forEach(row => { %>
+        <tr>
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td class="<%= key === 'price.tier' ? '' : 'bar-data' %>">
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+         </tr>
+        <% }) %>
+          
+    </tbody>
+    <% } else { %>
+      <p>Absolute change in share</p>
+    <% } %>
+  </table>
+  </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+     <div id="serves" class="tab-pane fade in">
+    <h1 class="mainhd">Serves</h1>
+
+    <ul class="nav nav-tabs">
+  <li class="active"><a data-toggle="tab" href="#Top-down" aria-expanded="true">Top-down</a></li>
+  <li><a data-toggle="tab" href="#Bottom-up" aria-expanded="true">Bottom-up</a></li>
+  <li><a data-toggle="tab" href="#Ensemble" aria-expanded="true">Ensemble forecasts</a></li>
+</ul>
+
+<div class="tab-content">
+  <div id="Top-down" class="tab-pane fade in active">
+    <div class="treandheader">
+    <button class="trendmodal btn" data-toggle="modal" data-target="#trend">Conversion Explanation</button>
+    </div>
+<div class="panel-group accordionrow" id="accordioninmain">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordioninmain" href="#motivationstrend"  class="collapsed">
+        Motivations Trend<i class="fa fa-angle-up align-right " aria-hidden="true"></i>
+    </a>
+      </h4>
+    </div>
+    <div id="motivationstrend" class="panel-collapse collapse in" >
+      <div class="panel-body">
+        <% const trend = data['Motivations trend']; %>
+    <% if (trend && trend.length > 0) { %>
+      <div class="table-responsive">
+    <table class="table table-hover tbyllow" id="Motivations-trend">
+      <% const cols = Object.keys(trend[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% trend.forEach(row => { %>
+      <tr>
+        <% Object.entries(row).forEach(([key, value]) => { %>
+          <td>
+            <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+          </td>
+        <% }) %>
+      </tr>
+      <% }) %>
+      <% } else { %>
+        <p>No data found for Motivations Trend</p>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+      </div>
+    </div>
+  </div>
+    
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordioninmain" href="#f24"   class="collapsed">
+        F24<i class="fa fa-angle-up align-right " aria-hidden="true"></i>
+    </a>
+      </h4>
+    </div>
+    <div id="f24" class="panel-collapse collapse" >
+      <div class="panel-body">
+        <% const f24 = data['LY']; %>
+        <% if (f24 && f24.length > 0) { %>
+          <div class="table-responsive">
+           <table class="table table-hover tbyllow" id="LY">
+            <% const cols = Object.keys(f24[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% f24.forEach(row => { %>
+        
+        <tr>
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td>
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+          
+        </tr>
+        <% }) %>
+        <% } else { %>
+          <p>No data found for F24</p>
+        <% } %>
+    </tbody>
+  </table>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordioninmain" href="#top-down-forecasts"  class="collapsed">
+        Display Top-Down Forecasts<i class="fa fa-angle-up align-right " aria-hidden="true"></i>
+    </a>
+      </h4>
+    </div>
+    <div id="top-down-forecasts" class="panel-collapse collapse"  >
+      <div class="panel-body">
+        <% const topDownForcast = data['Top Down serves forecast']; %>
+        <% if (topDownForcast && topDownForcast.length > 0) { %>
+          <div class="table-responsive">
+      <table class="table table-hover tbyllow" id="Top-Down-serves-forecast">
+        <% const cols = Object.keys(topDownForcast[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% topDownForcast.forEach(row => { %>
+        <tr>
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td>
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+        
+        </tr>
+        <% }) %>
+        <% } else { %>
+          <p>No data found for Display Top-Down Forecasts</p>
+        <% } %>
+    </tbody>
+  </table>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </div>
+
+
+     <div id="Bottom-up" class="tab-pane fade">
+<div class="panel-group accordionrow" id="accordioninone">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordioninone" href="#display-foresight"  class="collapsed">
+        Display Foresight Trends<i class="fa fa-angle-up align-right " aria-hidden="true"></i>
+    </a>
+      </h4>
+    </div>
+    <div id="display-foresight" class="panel-collapse collapse in" >
+      <div class="panel-body">
+        <% const foreSightTrend = data['Foresights trend']; %>
+        <% if (foreSightTrend && foreSightTrend.length > 0) { %>
+<div class="table-responsive">
+                 <table class="table table-hover tbyllow" id="Foresights-trend">
+                <% const cols = Object.keys(foreSightTrend[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% foreSightTrend.forEach(row => { %>
+        
+        <tr>
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td>
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+        </tr>
+        <% }) %>
+        <% } else { %>
+          <p>No data found for views/report.ejs</p>
+        <% } %>
+    </tbody>
+  </table>
+ </div>
+      </div>
+    </div>
+  </div>
+    
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordioninone" href="#display-weights"  class="collapsed">
+      Display Foresight Weights<i class="fa fa-angle-up align-right " aria-hidden="true"></i>
+    </a>
+      </h4>
+    </div>
+    <div id="display-weights" class="panel-collapse collapse" >
+      <div class="panel-body">
+        <% const foresightWeights = data['Foresight Weight']; %>
+        <% if (foresightWeights && foresightWeights.length > 0) { %>
+          <div class="table-responsive">
+           <table class="table table-hover tbyllow" id="Foresight-Weight">
+            <% const cols = Object.keys(foresightWeights[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+     
+      <% foresightWeights.forEach(row => { %>
+        <tr>
+          <% Object.values(row).forEach(value => { %>
+            <td><%= value %></td>
+          <% }) %>
+
+        
+        </tr>
+        <% }) %>
+        <% } else { %>
+          <p>No data found for Display Top-Down Forecasts</p>
+        <% } %>
+    </tbody>
+  </table>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordioninone" href="#Display-bottom-up-forecasts"  class="collapsed">
+        Display Bottom-up Forecasts<i class="fa fa-angle-up align-right " aria-hidden="true"></i>
+    </a>
+      </h4>
+    </div>
+    <div id="Display-bottom-up-forecasts" class="panel-collapse collapse" >
+      <div class="panel-body">
+        <% const bottomUpForeCast = data['Bottomup serves forecast']; %>
+        <% if (bottomUpForeCast && bottomUpForeCast.length > 0) { %>
+          <div class="table-responsive">
+      <table class="table table-hover tbyllow" id="Bottomup-serves-forecast">
+        <% const cols = Object.keys(bottomUpForeCast[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% bottomUpForeCast.forEach(row => { %>
+        <tr>
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td>
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+        
+        </tr>
+        <% }) %>
+        <% } else { %>
+          <p>No data found for Display Bottom-up Forecasts</p>
+        <% } %>
+
+    </tbody>
+  </table>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+  <div id="Ensemble" class="tab-pane fade">
+   <div class="panel-group accordionrow" id="accordiontwo">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordiontwo" href="#Display-ensemble-wts"  class="collapsed">
+       Display Ensemble Weights<i class="fa fa-angle-up align-right " aria-hidden="true"></i>
+    </a>
+      </h4>
+    </div>
+    <div id="Display-ensemble-wts" class="panel-collapse collapse in" >
+      <div class="panel-body">
+        <% const ensembleWeights = data['Ensemble weights']; %>
+        <% if (ensembleWeights && ensembleWeights.length > 0) { %>
+          <div class="table-responsive">
+               <table class="table table-hover tbyllow" id="Ensemble-weights">
+                <% const cols = Object.keys(ensembleWeights[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% ensembleWeights.forEach(row => { %>
+        <tr>
+          <td><%= row['topdown'] %></td>
+          <td><%= row['bottomup'] %></td>
+          
+        
+        </tr>
+        <% }) %>
+        <% } else { %>
+          <p>No data found for Display Bottom-up Forecasts</p>
+        <% } %>
+    </tbody>
+  </table>
+</div>
+      </div>  
+    </div>
+  </div>
+    
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordiontwo" href="#forecasts"  class="collapsed">
+        Display Ensemble Forecasts<i class="fa fa-angle-up align-right " aria-hidden="true"></i>
+    </a>
+      </h4>
+    </div>
+    <div id="forecasts" class="panel-collapse collapse"  >
+      <div class="panel-body">
+        <% const ensembleServesForecast = data['Ensemble serves forecast']; %>
+        <% if (ensembleServesForecast && ensembleServesForecast.length > 0) { %>
+          <div class="table-responsive">
+           <table class="table table-hover tbyllow" id="Ensemble-serves-forecast">
+            <% const cols = Object.keys(ensembleServesForecast[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>" class="<%= getTierColumnBg(label) %>"><%= label %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% ensembleServesForecast.forEach(row => { %>
+        <tr>
+          <% Object.entries(row).forEach(([key, value]) => { %>
+            <td>
+              <%= key === 'price.tier' ? String(value).toUpperCase() : value %>
+            </td>
+          <% }) %>
+        
+        </tr>
+        <% }) %>
+        <% } else { %>
+          <p>No data found for Display Bottom-up Forecasts</p>
+        <% } %>
+    </tbody>
+  </table>
+</div>
+      </div>
+    </div>
+  </div>
+
+
+  </div>
+
+
+
+</div>
+
+  </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+</article>
+
+<div id="mekkomodal" class="modal fade mekkomodalcontainer" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close-modal-icon" data-dismiss="modal"><img src="images/close-icon.svg" alt="Close"></button>
+      <h4 class="modal-title">Decision Matrix</h4>
+     
+    </div>
+    <div class="modal-body">
+      <% 
+        const cyear = data['Current_year'];
+        const currentYear = cyear[0]['Current.Year'];
+        let forcastedYear = '';
+       
+        if (cyear && cyear.length > 0 && cyear[0]['Current.Year']) {
+          const rawYear = cyear[0]['Current.Year'];
+          forcastedYear = parseInt(rawYear) + parseInt(duration);
+        }
+      %>
+      <h3>
+        <span>Current Year: <%= currentYear %></span>
+        &nbsp;|&nbsp;
+        <span>Forecasted Year: <%= forcastedYear %></span>
+      </h3>
+          <div class="table-responsive">
+            <% const decisionMatrix = data['Decision Matrix']; %>
+            <% if (decisionMatrix && decisionMatrix.length > 0) { %> 
+              <div style="overflow-x: auto; max-width: 100%;">
+      <table class="table table-hover" id="Decision-Matrix" style="min-width: 1000px; table-layout: fixed;">
+        <% const cols = Object.keys(decisionMatrix[0]); %>
+    <thead>
+      <tr>
+        <% cols.forEach((col, index) => { 
+          const label = col
+            .replace(/[._]/g, ' ')                   // Replace dot/underscore with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2')     // Handle camelCase
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        %>
+        <th data-val="<%= col %>"><%= label %></th>
+        <% }) %>
+
+      </tr>
+    </thead>
+    <tbody>
+      <%
+          function getRoleClass(role) {
+            switch (role) {
+              case 'Invest to grow(ahead)':
+              return 'role-ahead';
+              case 'Invest to grow(now)':
+              return 'role-now';
+              case 'Selective Plays':
+              return 'role-selective';
+              case 'Maintain':
+              return 'role-maintain ';
+              default:
+                return '';
+            }
+          }
+      %>
+      <% decisionMatrix.forEach(row => { %>
+        <tr>
+          <td data-fulltext="<%= row['Valuepool'] %>"><%= row['Valuepool'].toUpperCase() %></td>
+          <td title="<%= row['CurrentRSV'] %>"><%= row['CurrentRSV']%></td>
+          <td title="<%= row['ContributionbyValuepool'] %>"><%= row['ContributionbyValuepool']%></td>
+          <td title="<%= row['FutureRSV'] %>"><%= row['FutureRSV']%></td>
+          <td title="<%= row['FutureContribyValuepool'] %>"><%= row['FutureContribyValuepool']%></td>
+          <td title="<%= row['CAGR'] %>"><%= row['CAGR']%></td>
+          <td title="<%= row['INCRSV'] %>"><%= row['INCRSV']%></td>
+          <td title="<%= row['DiagecurrentRSV'] %>"><%= row['DiagecurrentRSV']%></td>
+          <td title="<%= row[' ContribyValuepool'] %>"><%= row[' ContribyValuepool']%></td>
+          <td title="<%= row[' CurrentShare'] %>"><%= row[' CurrentShare']%></td>
+          <td title="<%= row[' VHRfairshare'] %>"><%= row[' VHRfairshare']%></td>
+          <td title="<%= row['Role1'] %>" class="<%= getRoleClass(row['Role1']) %>"><%= row['Role1']%></td>
+          <td title="<%= row[' VHR100pershare'] %>"><%= row[' VHR100pershare']%></td>
+          <td title="<%= row['Role2'] %>" class="<%= getRoleClass(row['Role2']) %>"><%= row['Role2']%></td>
+          <td title="<%= row['Role3'] %>" class="<%= getRoleClass(row['Role3']) %>"><%= row['Role3']%></td>
+          
+
+         <!-- <td><%= row['Valuepool'].toUpperCase() %></td>
+          <td ><%= row['CurrentRSV']%></td>
+          <td ><%= row['ContributionbyValuepool']%></td>
+          <td ><%= row['FutureRSV']%></td>
+          <td><%= row['FutureContribyValuepool']%></td>
+          <td><%= row['CAGR']%></td>
+          <td ><%= row['INCRSV']%></td>
+          <td ><%= row['DiagecurrentRSV']%></td>
+          <td ><%= row[' ContribyValuepool']%></td>
+          <td ><%= row[' CurrentShare']%></td>
+          <td ><%= row[' VHRfairshare']%></td>
+          <td  class="<%= getRoleClass(row['Role1']) %>"><%= row['Role1']%></td>
+          <td><%= row[' VHR100pershare']%></td>
+          <td  class="<%= getRoleClass(row['Role2']) %>"><%= row['Role2']%></td>
+          <td  class="<%= getRoleClass(row['Role3']) %>"><%= row['Role3']%></td> -->
+          
+        </tr>
+        <% }) %>
+        <% } else { %>
+          <p>No data found for Display Bottom-up Forecasts</p>
+        <% } %>
+    </tbody>
+  </table>
+  </div>
+</div>   
+      </div>
+    </div>
+
+  </div>
+
+  </div>
+</div>
+</div>
+</section>
+
+</article>
+
+<!-- Modal -->
+<div id="trend" class="modal fade trendchartmodal" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close-modal-icon" data-dismiss="modal"><img src="images/close-icon.svg" alt="Close"></button>
+        <h4 class="modal-title">Conversion Explanation</h4>
+      </div>
+      <div class="modal-body">
+
+<h2>Absolute Change in Share by Value Pool </h2>
+<div class="table-responsive">
+       <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>2023 </th>
+        <th>Relax</th>
+        <th>Reward</th>
+         <th>Savour</th>
+        <th>Revel</th>
+        <th>Connect</th>
+        <th>Impress</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>S/UP+ </td>
+        <td bgcolor="#fd7669">0.9% </td>
+        <td bgcolor="#fa9c75">1.6%</td>
+        <td bgcolor="#fa725a">1.1% </td>
+        <td bgcolor="#f9766e">0.8% </td>
+        <td bgcolor="#ffe983">3.3% </td>
+        <td bgcolor="#ff4935">0.8% </td>
+      </tr>
+                 <tr>
+        <td>Premium </td>
+         <td bgcolor="#ffe983">3.5% </td>
+        <td bgcolor="#fcd27e">2.8% </td>
+        <td bgcolor="#d4df83">4.6% </td>
+        <td bgcolor="#faa876">1.9%</td>
+        <td bgcolor="#e2e483">4.2%</td>
+        <td bgcolor="#f8696b">0.5%</td>
+      </tr>
+               <tr>
+        <td>Standard </td>
+        <td bgcolor="#ccdd81">4.9% </td>
+        <td bgcolor="#afd580">5.7% </td>
+        <td bgcolor="#64bf7c">7.9%</td>
+        <td bgcolor="#efe784">3.9% </td>
+        <td bgcolor="#63be7b">7.9% </td>
+        <td bgcolor="#f9876f">1.2% </td>
+      </tr>
+      <tr>
+        <td>Upper MSS </td>
+        <td bgcolor="#fdc97d">2.6% </td>
+        <td bgcolor="#feeb84">3.4% </td>
+        <td bgcolor="#ebe583">3.9% </td>
+        <td bgcolor="#fa9e75">1.7% </td>
+        <td bgcolor="#c3da80">5.1% </td>
+        <td bgcolor="#f6706b">0.7% </td>
+      </tr>
+       <tr>
+        <td>Lower MSS </td>
+        <td bgcolor="#d7e083">4.5% </td>
+        <td bgcolor="#d1de82">4.7% </td>
+        <td bgcolor="#69c07c">7.7% </td>
+        <td bgcolor="#fbbe7b">2.4% </td>
+        <td bgcolor="#d6df82">4.5% </td>
+        <td bgcolor="#f9856f">1.1% </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+<h2>Top Down</h2>
+<div class="table-responsive">
+       <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Price Tier</th>
+        <th>Relax</th>
+        <th>Reward</th>
+         <th>Savour</th>
+        <th>Impress</th>
+        <th>Revel</th>
+        <th>Connect</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Lower MSS</td>
+        <td>18.73%</td>
+        <td>17.07%</td>
+        <td>28.18%</td>
+        <td >3.25%</td>
+        <td>8.08%</td>
+        <td>24.7%</td>
+      </tr>
+             <tr>
+        <td>Premium</td>
+        <td>16.59%</td>
+        <td>14.62%</td>
+        <td>25.43%</td>
+        <td >3.63%</td>
+        <td>10.86%</td>
+        <td>28.86%</td>
+      </tr>
+       <tr>
+        <td>S/UP+</td>
+        <td>6.31%</td>
+        <td>14.87%</td>
+        <td>14.71%</td>
+        <td >17.61%</td>
+        <td>12.68%</td>
+        <td>33.82%</td>
+      </tr>
+      <tr>
+        <td>Standard</td>
+        <td>20.79%</td>
+        <td>15.92%</td>
+        <td>19.43%</td>
+        <td >2.54%</td>
+        <td>10.34%</td>
+        <td>30.99%</td>
+      </tr>
+       <tr>
+        <td>Upper MSS</td>
+        <td>16%</td>
+        <td>17.88%</td>
+        <td>23.44%</td>
+        <td >4.15%</td>
+        <td>10.22%</td>
+        <td>28.31%</td>
+      </tr>
+    </tbody></table>
+</div>
+ </div>
+    </div>
+
+  </div>
+</div>
+<div id="reportspinner" class="reportspinner hidden">
+  <div class="reportloader"></div>
+</div>
+
+<!-- Publish Report Modal -->
+<div id="publish" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Publish Report</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to publish this report?</p>
+        <p>Once published, the report will be:</p>
+        <ul>
+          <li>Uploaded to Azure Blob Storage</li>
+          <li>Made available in the published reports dashboard</li>
+          <li>Accessible to authorized users</li>
+        </ul>
+        <div id="publishStatus" style="margin-top: 15px; display: none;">
+          <div class="alert" id="publishAlert"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmPublishBtn">Publish Report</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup Modal -->
+
+
+
+
+  <script nonce="<%= nonce %>">
+    // Make report ID available to JavaScript
+    <% if (typeof reportId !== 'undefined' && reportId) { %>
+      window.reportId = <%= reportId %>;
+    <% } %>
+  </script>
+  <script nonce="<%= nonce %>" src="js/jquery.min.js"></script>
+  <script nonce="<%= nonce %>" src="boostrap/bootstrap.min.js"></script>
+
+</body>
+
+
+<!-- <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-export.min.js"></script> -->
+
+<!-- <script src="/js/anychart-bundle.min.js"></script>
+<script src="/js/anychart-export.min.js"></script> -->
+<script  nonce="<%= nonce %>" src="/js/renderMekko.js"></script>
+<script nonce="<%= nonce %>" src="/js/exportCharts.js"></script>
+<script nonce="<%= nonce %>" type="module" src="/js/reports.js"></script>
+
+<!-- </html> -->

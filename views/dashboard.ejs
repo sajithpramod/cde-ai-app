@@ -1,0 +1,169 @@
+<article>
+  <header>
+    <div class="headerlogo">
+      <img src="images/logo.png" alt="" />
+      <span class="navtittile">Occasion-Motivation Forecasting</span>
+    </div>
+    <div class="header-actions">
+      <a href="/auth/logout" class="btn btn-danger">
+        <i class="fa fa-sign-out"></i> Logout
+      </a>
+    </div>
+  </header>
+
+  <div class="container content-below-header">
+
+    <!-- Title & Read Me Button -->
+    <div class="row">
+      <div class="col-xs-6">
+        <h2>Forecast Dashboard</h2>
+      </div>
+      <div class="col-xs-6 text-right p-t1">
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#readMeModal">
+          Read Me
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <form class="form-inline dashinlineblock" method="GET" action="/dashboard" style="margin-top: 20px; gap: 10px; flex-wrap: wrap;">
+      <div class="form-group mx-sm-2">
+        <label for="dataType" class="sr-only">Data Type</label>
+        <select name="dataType" id="dataType" class="form-control">
+          <option value="">All Types</option>
+          <option value="IWSR" <%= filters && filters.dataType === 'IWSR' ? 'selected' : '' %>>IWSR</option>
+          <option value="Retail" <%= filters && filters.dataType === 'Retail' ? 'selected' : '' %>>Retail</option>
+        </select>
+      </div>
+
+      <div class="form-group mx-sm-2">
+        <label for="duration" class="sr-only">Duration</label>
+        <select id="duration" name="duration" class="form-control">
+          <option value="">-- Duration --</option>
+          <option value="3" <%= filters && filters.duration === '3' ? 'selected' : '' %>>+3 Years</option>
+          <option value="4" <%= filters && filters.duration === '4' ? 'selected' : '' %>>+4 Years</option>
+          <option value="5" <%= filters && filters.duration === '5' ? 'selected' : '' %>>+5 Years</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary ml-sm-2 mt-0 mt-left apply-button">Apply Filter</button>
+    </form>
+
+  
+    <div class="table-responsive" style="margin-top: 30px;">
+      <table class="table table-bordered table-striped table-hover">
+        <thead style="color: #fff;">
+          <tr>
+            <th><a href="#" data-sort="reportName" class="sort-link">Report Name</a></th>
+            <th><a href="#" data-sort="forecastedBy" class="sort-link">Forecasted By</a></th>
+            <th><a href="#" data-sort="dataType" class="sort-link">Data Type</a></th>
+            <th><a href="#" data-sort="marketModel" class="sort-link">Market Model</a></th>
+            <th><a href="#" data-sort="typeOfMarket" class="sort-link">Type of Market</a></th>
+            <th><a href="#" data-sort="publishedDate" class="sort-link">Published Date</a></th>
+            <th>View</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (reportData && reportData.length > 0) { %>
+            <% reportData.forEach(function(report) { %>
+              <tr>
+                <td><%= report.reportName %></td>
+                <td><%= report.forecastedBy %></td>
+                <td><%= report.dataType %></td>
+                <td><%= report.marketModel %></td>
+                <td><%= report.typeOfMarket %></td>
+                <td><%= report.publishedDate %></td>
+                <td>
+                  <a href="/dashboard/view-report/<%= report.id %>" title="View Report" style="cursor: pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 0 576 512" fill="#007bff">
+                      <path d="M572.52 241.4C518.54 135.78 407.5 64 288 64S57.46 135.78 3.48 241.4a48.07
+                               48.07 0 0 0 0 45.2C57.46 376.22 168.5 448 288 448s230.54-71.78 284.52-161.4a48.07
+                               48.07 0 0 0 0-45.2zM288 400c-88.22 0-168.8-48.52-218.48-128C119.2 192.52 199.78
+                               144 288 144s168.8 48.52 218.48 128C456.8 351.48 376.22 400 288 400zm0-208a80
+                               80 0 1 0 80 80 80.09 80.09 0 0 0-80-80z"/>
+                    </svg>
+                  </a>
+                </td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="7" class="text-center">No reports found</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- Pagination -->
+    <div class="row">
+      <div class="col-md-6 forcast-btn"><a href="/upload" class="btn btn-success mt-3">New Forecast</a></div>
+      <div class="col-xs-6 text-right">
+        <% if (pagination) { %>
+          <%
+            // Build query string with current filters
+            const buildQueryString = (page) => {
+              const params = new URLSearchParams();
+              if (page) params.append('page', page);
+              if (filters.marketType) params.append('marketType', filters.marketType);
+              if (filters.marketModel) params.append('marketModel', filters.marketModel);
+              if (filters.dataType) params.append('dataType', filters.dataType);
+              if (filters.duration) params.append('duration', filters.duration);
+              return params.toString() ? '?' + params.toString() : '';
+            };
+          %>
+          <ul class="pagination">
+            <% if (pagination.prevPage) { %>
+              <li><a href="/dashboard<%= buildQueryString(pagination.prevPage) %>">&laquo;</a></li>
+            <% } else { %>
+              <li class="disabled"><span>&laquo;</span></li>
+            <% } %>
+          
+            <% for (var i = 1; i <= pagination.totalPages; i++) { %>
+              <li class="<%= i === pagination.currentPage ? 'active' : '' %>">
+                <a href="/dashboard<%= buildQueryString(i) %>"><%= i %></a>
+              </li>
+            <% } %>
+          
+            <% if (pagination.nextPage) { %>
+              <li><a href="/dashboard<%= buildQueryString(pagination.nextPage) %>">&raquo;</a></li>
+            <% } else { %>
+              <li class="disabled"><span>&raquo;</span></li>
+            <% } %>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- New Forecast Button -->
+  </div>
+
+  <!-- Read Me Modal -->
+  <div class="modal fade" id="readMeModal" tabindex="-1" role="dialog" aria-labelledby="readMeModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span>&times;</span>
+          </button>
+          <h4 class="modal-title" id="readMeModalLabel">Read Me</h4>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            This dashboard shows forecast reports. You can filter by model type, market model, data type, and duration.
+            Click "New Forecast" to start a new report. Click on column headers to sort.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</article>
+<script nonce="<%= nonce %>" src="/js/jquery.min.js"></script>
+<script nonce="<%= nonce %>" src="/boostrap/bootstrap.min.js"></script>
+<script nonce="<%= nonce %>" src="/js/dashboard.js"></script>
